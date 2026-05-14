@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Сравнение Wildberries-предложений</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f2fb;
+      --panel: rgba(255, 255, 255, 0.86);
+      --panel-strong: #ffffff;
+      --text: #201429;
+      --muted: #725f7d;
+      --accent: #a900ff;
+      --accent-2: #ff2f8f;
+      --border: rgba(115, 59, 143, 0.17);
+      --shadow: 0 20px 55px rgba(63, 28, 82, 0.14);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255, 47, 143, 0.20), transparent 34rem),
+        radial-gradient(circle at top right, rgba(169, 0, 255, 0.18), transparent 32rem),
+        var(--bg);
+    }
+
+    .page {
+      width: min(1480px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 52px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 26px;
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.62));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .hero__label {
+      width: fit-content;
+      padding: 8px 13px;
+      border-radius: 999px;
+      color: #7810b6;
+      background: rgba(169, 0, 255, 0.11);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 5vw, 64px);
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+    }
+
+    .hero p {
+      max-width: 860px;
+      margin: 0;
+      color: var(--muted);
+      font-size: clamp(16px, 2vw, 20px);
+      line-height: 1.55;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 24px 0;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--panel);
+    }
+
+    .hint {
+      max-width: 700px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      position: relative;
+      display: flex;
+      min-height: 390px;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: var(--panel-strong);
+      box-shadow: 0 15px 38px rgba(61, 22, 82, 0.10);
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(169, 0, 255, 0.32);
+      box-shadow: 0 24px 54px rgba(61, 22, 82, 0.18);
+    }
+
+    .image-wrap {
+      position: relative;
+      display: grid;
+      min-height: 292px;
+      place-items: center;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(169, 0, 255, 0.08), rgba(255, 47, 143, 0.10)),
+        #f1eaf8;
+    }
+
+    .product-image {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 292px;
+      object-fit: cover;
+      object-position: center;
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+
+    .product-image.is-loaded { opacity: 1; }
+
+    .badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      z-index: 2;
+      display: inline-grid;
+      min-width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 14px;
+      color: white;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      font-weight: 900;
+      box-shadow: 0 12px 22px rgba(169, 0, 255, 0.25);
+    }
+
+    .status {
+      position: absolute;
+      inset: auto 12px 12px;
+      z-index: 2;
+      padding: 8px 10px;
+      border-radius: 14px;
+      color: #5c4168;
+      background: rgba(255, 255, 255, 0.88);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .body {
+      display: grid;
+      gap: 12px;
+      padding: 15px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.25;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 40px;
+      padding: 0 12px;
+      border: 0;
+      border-radius: 13px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      font: inherit;
+      font-size: 14px;
+      font-weight: 850;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .button--ghost {
+      width: 42px;
+      padding: 0;
+      color: var(--accent);
+      background: rgba(169, 0, 255, 0.10);
+    }
+
+    .search-preview {
+      display: grid;
+      gap: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .search-icon {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto;
+      border-radius: 28px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 20px 32px rgba(169, 0, 255, 0.25);
+    }
+
+    .search-preview strong {
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .search-preview span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    @media (max-width: 560px) {
+      .page { width: min(100% - 18px, 1480px); padding-top: 12px; }
+      .hero { padding: 20px; border-radius: 22px; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .card { min-height: 300px; border-radius: 18px; }
+      .image-wrap, .product-image { min-height: 205px; }
+      .body { padding: 11px; }
+      .title { font-size: 13px; }
+      .actions { grid-template-columns: 1fr; }
+      .button--ghost { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero__label">Wildberries comparison board</div>
+      <h1 id="page-title">Одностраничное сравнение предложений</h1>
+      <p>Каждая карточка соответствует одной исходной ссылке. Для карточек товаров изображение подбирается по артикулу Wildberries, чтобы быстро увидеть различия между предложениями.</p>
+    </section>
+
+    <section class="toolbar" aria-label="Информация о подборке">
+      <div class="stats">
+        <span class="pill">14 ссылок</span>
+        <span class="pill">13 карточек товаров</span>
+        <span class="pill">1 поисковая выдача</span>
+      </div>
+      <div class="hint">Если Wildberries временно блокирует прямую загрузку изображения, откройте товар кнопкой «Открыть» — ссылка сохранена в каждой карточке.</div>
+    </section>
+
+    <section class="grid" id="offers" aria-label="Список предложений Wildberries"></section>
+  </main>
+
+  <template id="card-template">
+    <article class="card">
+      <div class="image-wrap">
+        <span class="badge"></span>
+        <img class="product-image" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+        <div class="status">Загружаем изображение…</div>
+      </div>
+      <div class="body">
+        <h2 class="title"></h2>
+        <div class="meta"></div>
+        <div class="actions">
+          <a class="button" target="_blank" rel="noopener noreferrer">Открыть</a>
+          <button class="button button--ghost" type="button" title="Скопировать ссылку" aria-label="Скопировать ссылку">⧉</button>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <script>
+    const offers = [
+      {
+        type: 'search',
+        label: 'Поисковая выдача',
+        note: '«Маски смешные на лицо»',
+        url: 'https://www.wildberries.ru/catalog/0/search.aspx?search=%D0%9C%D0%B0%D1%81%D0%BA%D0%B8%20%D1%81%D0%BC%D0%B5%D1%88%D0%BD%D1%8B%D0%B5%20%D0%BD%D0%B0%20%D0%BB%D0%B8%D1%86%D0%BE'
+      },
+      { id: 338765677, url: 'https://www.wildberries.ru/catalog/338765677/detail.aspx' },
+      { id: 365454542, url: 'https://www.wildberries.ru/catalog/365454542/detail.aspx' },
+      { id: 275455439, url: 'https://www.wildberries.ru/catalog/275455439/detail.aspx' },
+      { id: 450959848, url: 'https://www.wildberries.ru/catalog/450959848/detail.aspx' },
+      { id: 381096286, url: 'https://www.wildberries.ru/catalog/381096286/detail.aspx' },
+      { id: 672395855, url: 'https://www.wildberries.ru/catalog/672395855/detail.aspx' },
+      { id: 303161769, url: 'https://www.wildberries.ru/catalog/303161769/detail.aspx' },
+      { id: 672395569, url: 'https://www.wildberries.ru/catalog/672395569/detail.aspx' },
+      { id: 374318753, url: 'https://www.wildberries.ru/catalog/374318753/detail.aspx' },
+      { id: 299387358, url: 'https://www.wildberries.ru/catalog/299387358/detail.aspx' },
+      { id: 478573487, url: 'https://www.wildberries.ru/catalog/478573487/detail.aspx' },
+      { id: 651139709, url: 'https://www.wildberries.ru/catalog/651139709/detail.aspx' },
+      { id: 484649071, url: 'https://www.wildberries.ru/catalog/484649071/detail.aspx' }
+    ];
+
+    const basketByVolume = (volume) => {
+      const ranges = [143, 287, 431, 719, 1007, 1061, 1115, 1169, 1313, 1601, 1655, 1919, 2045, 2189, 2405, 2621, 2837, 3053, 3269, 3485, 3701, 3917, 4133, 4349, 4565, 4877, 5189, 5501, 5813, 6125, 6437, 6749];
+      const index = ranges.findIndex((max) => volume <= max);
+      return String((index === -1 ? ranges.length + 1 : index + 1)).padStart(2, '0');
+    };
+
+    const primaryImageUrl = (id) => {
+      const volume = Math.floor(id / 100000);
+      const part = Math.floor(id / 1000);
+      const basket = basketByVolume(volume);
+      return `https://basket-${basket}.wbbasket.ru/vol${volume}/part${part}/${id}/images/big/1.webp`;
+    };
+
+    const fallbackImageUrls = (id) => {
+      const volume = Math.floor(id / 100000);
+      const part = Math.floor(id / 1000);
+      return Array.from({ length: 40 }, (_, index) => {
+        const basket = String(index + 1).padStart(2, '0');
+        return `https://basket-${basket}.wbbasket.ru/vol${volume}/part${part}/${id}/images/big/1.webp`;
+      });
+    };
+
+    const renderSearchCard = (offer, number) => {
+      const template = document.querySelector('#card-template');
+      const card = template.content.firstElementChild.cloneNode(true);
+      const img = card.querySelector('.product-image');
+      const status = card.querySelector('.status');
+      const copyButton = card.querySelector('button');
+      const link = card.querySelector('a');
+
+      card.querySelector('.badge').textContent = number;
+      card.querySelector('.title').textContent = offer.label;
+      card.querySelector('.meta').textContent = offer.note;
+      img.alt = `Скриншот поисковой выдачи Wildberries: ${offer.note}`;
+      link.href = offer.url;
+      copyButton.addEventListener('click', () => copyUrl(offer.url));
+
+      img.onload = () => {
+        img.classList.add('is-loaded');
+        status.textContent = 'Скриншот выдачи';
+      };
+      img.onerror = () => {
+        status.textContent = 'Откройте выдачу по ссылке';
+      };
+      img.src = `https://image.thum.io/get/width/900/crop/1100/noanimate/${offer.url}`;
+      return card;
+    };
+
+    const copyUrl = async (url) => {
+      try {
+        await navigator.clipboard.writeText(url);
+      } catch {
+        window.prompt('Скопируйте ссылку:', url);
+      }
+    };
+
+    const loadWithFallbacks = (img, status, urls, currentIndex = 0) => {
+      if (currentIndex >= urls.length) {
+        status.textContent = 'Не удалось загрузить превью';
+        return;
+      }
+
+      img.onload = () => {
+        img.classList.add('is-loaded');
+        status.textContent = 'Изображение товара';
+      };
+      img.onerror = () => loadWithFallbacks(img, status, urls, currentIndex + 1);
+      img.src = urls[currentIndex];
+    };
+
+    const renderProductCard = (offer, number) => {
+      const template = document.querySelector('#card-template');
+      const card = template.content.firstElementChild.cloneNode(true);
+      const img = card.querySelector('.product-image');
+      const status = card.querySelector('.status');
+      const copyButton = card.querySelector('button');
+      const link = card.querySelector('a');
+
+      card.querySelector('.badge').textContent = number;
+      card.querySelector('.title').textContent = `Товар ${offer.id}`;
+      card.querySelector('.meta').textContent = `Артикул WB: ${offer.id}`;
+      img.alt = `Изображение товара Wildberries ${offer.id}`;
+      link.href = offer.url;
+      copyButton.addEventListener('click', () => copyUrl(offer.url));
+
+      loadWithFallbacks(img, status, [primaryImageUrl(offer.id), ...fallbackImageUrls(offer.id)]);
+      return card;
+    };
+
+    const root = document.querySelector('#offers');
+    offers.forEach((offer, index) => {
+      const number = index + 1;
+      root.append(offer.type === 'search' ? renderSearchCard(offer, number) : renderProductCard(offer, number));
+    });
+  </script>
+</body>
+</html>

@@ -7,8 +7,8 @@
   <style>
     :root {
       --page-bg: #f5f5f7;
-      --surface: rgba(255, 255, 255, 0.86);
-      --surface-solid: #ffffff;
+      --surface: rgba(255, 255, 255, 0.88);
+      --surface-strong: #ffffff;
       --text: #1d1d1f;
       --muted: #86868b;
       --line: rgba(29, 29, 31, 0.10);
@@ -35,8 +35,8 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.96) 0 26rem, transparent 42rem),
-        linear-gradient(180deg, #ffffff 0%, var(--page-bg) 38%, #ffffff 100%);
+        radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.98) 0 26rem, transparent 42rem),
+        linear-gradient(180deg, #ffffff 0%, var(--page-bg) 42%, #ffffff 100%);
     }
 
     button,
@@ -141,7 +141,7 @@
       border: 1px solid var(--line);
       border-radius: 36px;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.84)),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.86)),
         radial-gradient(circle at 50% 30%, rgba(124, 92, 255, 0.10), transparent 28rem);
       box-shadow: var(--soft-shadow);
       scroll-snap-align: center;
@@ -254,6 +254,10 @@
       color: var(--muted);
       font-size: 14px;
       font-weight: 600;
+    }
+
+    .load-state.is-ready {
+      opacity: 0;
     }
 
     .actions {
@@ -412,6 +416,10 @@
         gap: 14px;
       }
 
+      .load-state.is-ready {
+        display: none;
+      }
+
       .actions {
         display: grid;
         grid-template-columns: 1fr;
@@ -457,11 +465,11 @@
 <body>
   <main class="page">
     <section class="hero" aria-labelledby="page-title">
-      <p class="eyebrow">13 товаров для быстрого сравнения</p>
+      <p class="eyebrow"><span id="total-products">13</span> товаров для быстрого сравнения</p>
       <h1 id="page-title">Wildberries Маски</h1>
       <p class="subtitle">Визуальное сравнение товаров в одном минималистичном каталоге.</p>
       <div class="quiet-stats" aria-live="polite">
-        <strong id="loaded-count">0</strong><span>из 13 изображений готово</span>
+        <strong id="loaded-count">0</strong><span>из <span id="total-images">13</span> изображений готово</span>
       </div>
     </section>
 
@@ -503,6 +511,8 @@
     const carousel = document.querySelector('#carousel');
     const counter = document.querySelector('#card-counter');
     const loadedCount = document.querySelector('#loaded-count');
+    const totalProducts = document.querySelector('#total-products');
+    const totalImages = document.querySelector('#total-images');
     const prevButton = document.querySelector('#prev-card');
     const nextButton = document.querySelector('#next-card');
 
@@ -510,6 +520,8 @@
     let successfulImages = 0;
     let wheelReleaseTimer;
 
+    totalProducts.textContent = productLinks.length;
+    totalImages.textContent = productLinks.length;
     loadedCount.textContent = successfulImages;
     counter.textContent = `1 / ${productLinks.length}`;
 
@@ -525,8 +537,9 @@
       return `https://basket-${basketNumber}.wbbasket.ru/vol${vol}/part${part}/${nmId}/images/big/1.webp`;
     }
 
-    function setImageState(statusElement, text) {
+    function setImageState(statusElement, text, isReady = false) {
       statusElement.textContent = text;
+      statusElement.classList.toggle('is-ready', isReady);
     }
 
     function showPlaceholder(container) {
@@ -547,7 +560,7 @@
         imageContainer.append(image);
         successfulImages += 1;
         loadedCount.textContent = successfulImages;
-        setImageState(statusElement, 'Изображение готово');
+        setImageState(statusElement, 'Изображение готово', true);
       };
 
       image.onerror = () => {

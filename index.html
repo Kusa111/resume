@@ -7,17 +7,15 @@
   <style>
     :root {
       --page-bg: #f5f5f7;
-      --surface: rgba(255, 255, 255, 0.88);
-      --surface-strong: #ffffff;
+      --card-bg: rgba(255, 255, 255, 0.92);
       --text: #1d1d1f;
       --muted: #86868b;
       --line: rgba(29, 29, 31, 0.10);
-      --shadow: 0 34px 90px rgba(0, 0, 0, 0.10);
-      --soft-shadow: 0 18px 50px rgba(0, 0, 0, 0.07);
       --button: #1d1d1f;
       --button-hover: #333336;
-      --violet: #7c5cff;
-      --slide-width: min(860px, 74vw);
+      --shadow-active: 0 36px 96px rgba(0, 0, 0, 0.13);
+      --shadow-rest: 0 18px 54px rgba(0, 0, 0, 0.08);
+      --slide-width: min(930px, 78vw);
     }
 
     * {
@@ -35,8 +33,8 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
       color: var(--text);
       background:
-        radial-gradient(circle at 50% -10%, rgba(255, 255, 255, 0.98) 0 26rem, transparent 42rem),
-        linear-gradient(180deg, #ffffff 0%, var(--page-bg) 42%, #ffffff 100%);
+        radial-gradient(circle at 50% -12%, rgba(255, 255, 255, 1) 0 23rem, transparent 40rem),
+        linear-gradient(180deg, #ffffff 0%, var(--page-bg) 48%, #ffffff 100%);
     }
 
     button,
@@ -45,128 +43,149 @@
     }
 
     .page {
-      width: min(100%, 1500px);
+      width: min(100%, 1520px);
       margin: 0 auto;
-      padding: 64px 0 56px;
+      padding: 38px 0 46px;
     }
 
     .hero {
       display: grid;
       justify-items: center;
-      gap: 14px;
-      width: min(920px, calc(100% - 40px));
-      margin: 0 auto 44px;
+      gap: 9px;
+      width: min(780px, calc(100% - 36px));
+      margin: 0 auto 22px;
       text-align: center;
     }
 
     .eyebrow {
       margin: 0;
       color: var(--muted);
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 650;
       letter-spacing: 0.01em;
     }
 
     h1 {
       margin: 0;
-      font-size: clamp(48px, 9vw, 112px);
-      font-weight: 750;
-      line-height: 0.92;
-      letter-spacing: -0.075em;
+      font-size: clamp(40px, 6.4vw, 78px);
+      font-weight: 760;
+      line-height: 0.96;
+      letter-spacing: -0.065em;
     }
 
     .subtitle {
-      max-width: 680px;
-      margin: 6px 0 0;
+      max-width: 580px;
+      margin: 2px 0 0;
       color: var(--muted);
-      font-size: clamp(19px, 2.2vw, 28px);
+      font-size: clamp(17px, 1.8vw, 22px);
       font-weight: 500;
-      line-height: 1.28;
-      letter-spacing: -0.025em;
+      line-height: 1.32;
+      letter-spacing: -0.02em;
     }
 
     .quiet-stats {
       display: inline-flex;
       align-items: center;
-      gap: 9px;
-      min-height: 36px;
-      margin-top: 10px;
-      padding: 8px 14px;
+      gap: 5px;
+      min-height: 28px;
+      margin-top: 4px;
+      padding: 6px 11px;
       border: 1px solid var(--line);
       border-radius: 999px;
       color: var(--muted);
-      background: rgba(255, 255, 255, 0.72);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-      font-size: 14px;
-      font-weight: 600;
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.035);
+      font-size: 12px;
+      font-weight: 650;
       backdrop-filter: blur(18px);
     }
 
     .quiet-stats strong {
       color: var(--text);
-      font-weight: 700;
+      font-weight: 750;
     }
 
     .carousel-shell {
       position: relative;
       width: 100vw;
       margin-left: calc(50% - 50vw);
+      overflow: hidden;
     }
 
     .carousel {
       display: flex;
-      gap: 28px;
+      gap: clamp(18px, 3vw, 34px);
       overflow-x: auto;
       overflow-y: hidden;
-      padding: 18px calc((100vw - var(--slide-width)) / 2) 42px;
+      padding: 18px calc((100vw - var(--slide-width)) / 2) 34px;
       scroll-behavior: smooth;
       scroll-padding-inline: calc((100vw - var(--slide-width)) / 2);
       scroll-snap-type: x mandatory;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
       scrollbar-width: none;
+      touch-action: pan-x pan-y;
     }
 
     .carousel::-webkit-scrollbar {
       display: none;
     }
 
+    .carousel::before,
+    .carousel::after {
+      position: sticky;
+      z-index: 2;
+      flex: 0 0 0;
+      width: 0;
+      pointer-events: none;
+      content: "";
+    }
+
     .product-card {
       position: relative;
       display: grid;
       flex: 0 0 var(--slide-width);
-      min-height: clamp(560px, 68vh, 740px);
-      grid-template-rows: auto minmax(300px, 1fr) auto;
+      min-height: clamp(650px, 76vh, 840px);
+      grid-template-rows: auto minmax(0, 1fr) auto;
       overflow: hidden;
-      padding: clamp(24px, 4vw, 44px);
+      padding: clamp(18px, 2.8vw, 32px);
       border: 1px solid var(--line);
-      border-radius: 36px;
+      border-radius: 38px;
       background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(255, 255, 255, 0.86)),
-        radial-gradient(circle at 50% 30%, rgba(124, 92, 255, 0.10), transparent 28rem);
-      box-shadow: var(--soft-shadow);
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.90)),
+        var(--card-bg);
+      box-shadow: var(--shadow-rest);
       scroll-snap-align: center;
-      transform: translateY(8px) scale(0.985);
-      opacity: 0;
-      animation: cardReveal 700ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-      transition: transform 360ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 360ms ease, border-color 360ms ease;
+      transform: scale(0.925);
+      opacity: 0.54;
+      animation: cardReveal 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transition:
+        transform 620ms cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 620ms ease,
+        box-shadow 620ms ease,
+        border-color 620ms ease;
+      will-change: transform, opacity;
     }
 
     .product-card.is-active {
-      box-shadow: var(--shadow);
-      transform: translateY(0) scale(1);
+      z-index: 1;
       border-color: rgba(29, 29, 31, 0.16);
+      box-shadow: var(--shadow-active);
+      transform: scale(1);
+      opacity: 1;
     }
 
     @media (hover: hover) and (pointer: fine) {
-      .product-card:hover {
-        transform: translateY(-4px) scale(1.005);
-        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.13);
+      .product-card.is-active:hover {
+        transform: translateY(-3px) scale(1.006);
+        box-shadow: 0 42px 110px rgba(0, 0, 0, 0.15);
       }
     }
 
     @keyframes cardReveal {
-      to {
-        opacity: 1;
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.91);
       }
     }
 
@@ -174,71 +193,73 @@
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      gap: 18px;
+      gap: 14px;
       min-width: 0;
+      padding: 2px 2px 0;
     }
 
     .card-kicker {
-      margin: 0 0 8px;
+      margin: 0 0 5px;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
+      letter-spacing: 0.02em;
     }
 
     .card-title {
       margin: 0;
-      font-size: clamp(26px, 4vw, 46px);
+      color: var(--text);
+      font-size: clamp(18px, 2.3vw, 26px);
       font-weight: 720;
-      line-height: 1.03;
-      letter-spacing: -0.055em;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
     }
 
     .card-number {
       flex: 0 0 auto;
       display: grid;
       place-items: center;
-      width: 48px;
-      height: 48px;
+      width: 38px;
+      height: 38px;
       border: 1px solid var(--line);
       border-radius: 50%;
-      color: var(--text);
-      background: rgba(245, 245, 247, 0.74);
-      font-size: 15px;
-      font-weight: 750;
+      color: var(--muted);
+      background: rgba(245, 245, 247, 0.64);
+      font-size: 13px;
+      font-weight: 760;
     }
 
     .image-stage {
       display: grid;
       place-items: center;
-      min-height: 0;
-      margin: clamp(16px, 3vw, 30px) 0;
-      border-radius: 30px;
-      background: linear-gradient(180deg, rgba(245, 245, 247, 0.72), rgba(255, 255, 255, 0.52));
+      min-height: min(68vh, 720px);
+      margin: clamp(6px, 1.5vw, 16px) 0 clamp(10px, 1.7vw, 18px);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(245, 245, 247, 0.42), rgba(255, 255, 255, 0.18));
     }
 
     .image-stage img {
       display: block;
       width: 100%;
-      height: min(440px, 50vh);
+      height: min(68vh, 720px);
+      max-height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 22px 38px rgba(0, 0, 0, 0.12));
+      filter: drop-shadow(0 24px 42px rgba(0, 0, 0, 0.13));
     }
 
     .placeholder {
       display: grid;
       place-items: center;
       width: min(100%, 520px);
-      min-height: 280px;
+      min-height: 320px;
       padding: 28px;
       border: 1px dashed rgba(29, 29, 31, 0.16);
       border-radius: 28px;
       color: var(--muted);
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(255, 255, 255, 0.56);
       text-align: center;
-      font-size: 18px;
-      font-weight: 600;
+      font-size: 17px;
+      font-weight: 650;
       line-height: 1.35;
     }
 
@@ -246,14 +267,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 18px;
+      gap: 14px;
+      padding: 0 2px 2px;
     }
 
     .load-state {
-      min-width: 140px;
+      min-width: 110px;
       color: var(--muted);
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 650;
+      transition: opacity 220ms ease;
     }
 
     .load-state.is-ready {
@@ -264,44 +287,45 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: flex-end;
-      gap: 10px;
+      gap: 9px;
     }
 
     .button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 46px;
-      padding: 12px 18px;
+      min-height: 42px;
+      padding: 10px 16px;
       border: 1px solid transparent;
       border-radius: 999px;
       text-decoration: none;
-      font-size: 15px;
-      font-weight: 700;
+      font-size: 14px;
+      font-weight: 720;
       cursor: pointer;
-      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease, color 180ms ease;
+      transition: transform 200ms ease, background 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
     }
 
     .button:focus-visible,
     .nav-button:focus-visible {
-      outline: 3px solid rgba(124, 92, 255, 0.35);
+      outline: 3px solid rgba(29, 29, 31, 0.16);
       outline-offset: 3px;
     }
 
     .button--primary {
       color: #ffffff;
       background: var(--button);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
     }
 
     .button--primary:hover {
       background: var(--button-hover);
       transform: translateY(-1px);
+      box-shadow: 0 15px 28px rgba(0, 0, 0, 0.17);
     }
 
     .button--secondary {
       color: var(--text);
-      background: rgba(245, 245, 247, 0.84);
+      background: rgba(245, 245, 247, 0.78);
       border-color: var(--line);
     }
 
@@ -310,110 +334,131 @@
       transform: translateY(-1px);
     }
 
-    .carousel-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      margin-top: 2px;
-    }
-
     .nav-button {
+      position: absolute;
+      top: 50%;
+      z-index: 5;
       display: grid;
       place-items: center;
-      width: 48px;
-      height: 48px;
-      border: 1px solid var(--line);
+      width: 54px;
+      height: 54px;
+      border: 1px solid rgba(29, 29, 31, 0.10);
       border-radius: 50%;
       color: var(--text);
-      background: rgba(255, 255, 255, 0.88);
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.58);
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.12);
       cursor: pointer;
-      transition: transform 180ms ease, background 180ms ease, opacity 180ms ease;
-      backdrop-filter: blur(18px);
+      transform: translateY(-50%);
+      transition: transform 220ms ease, background 220ms ease, opacity 220ms ease, box-shadow 220ms ease;
+      backdrop-filter: blur(22px) saturate(180%);
+    }
+
+    .nav-button--prev {
+      left: max(18px, calc((100vw - var(--slide-width)) / 2 - 82px));
+    }
+
+    .nav-button--next {
+      right: max(18px, calc((100vw - var(--slide-width)) / 2 - 82px));
     }
 
     .nav-button:hover {
-      background: #ffffff;
-      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.14);
+      transform: translateY(-50%) scale(1.04);
     }
 
     .nav-button:disabled {
-      opacity: 0.36;
+      opacity: 0.18;
       cursor: default;
-      transform: none;
-    }
-
-    .counter {
-      min-width: 82px;
-      color: var(--muted);
-      text-align: center;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: -0.01em;
+      transform: translateY(-50%) scale(0.96);
     }
 
     @media (max-width: 760px) {
       :root {
-        --slide-width: min(420px, 88vw);
+        --slide-width: min(430px, 90vw);
       }
 
       .page {
-        padding: 42px 0 32px;
+        padding: 24px 0 28px;
       }
 
       .hero {
-        width: min(100% - 30px, 560px);
-        margin-bottom: 24px;
+        width: min(100% - 28px, 560px);
+        gap: 7px;
+        margin-bottom: 12px;
+      }
+
+      .eyebrow {
+        font-size: 12px;
       }
 
       h1 {
-        font-size: clamp(44px, 16vw, 72px);
+        font-size: clamp(36px, 12vw, 54px);
+        letter-spacing: -0.06em;
       }
 
       .subtitle {
-        font-size: 19px;
+        max-width: 330px;
+        font-size: 16px;
+      }
+
+      .quiet-stats {
+        min-height: 26px;
+        padding: 5px 10px;
+        font-size: 11px;
       }
 
       .carousel {
-        gap: 16px;
-        padding-bottom: 28px;
+        gap: 14px;
+        padding-top: 10px;
+        padding-bottom: 20px;
       }
 
       .product-card {
-        min-height: min(680px, calc(100vh - 160px));
-        padding: 22px;
+        min-height: min(680px, calc(100dvh - 128px));
+        padding: 15px;
         border-radius: 30px;
-        grid-template-rows: auto minmax(250px, 1fr) auto;
+        transform: scale(0.965);
+        opacity: 0.72;
+      }
+
+      .product-card.is-active {
+        transform: scale(1);
       }
 
       .card-top {
-        gap: 12px;
+        gap: 10px;
+      }
+
+      .card-kicker {
+        margin-bottom: 3px;
+        font-size: 12px;
       }
 
       .card-title {
-        font-size: 28px;
-        letter-spacing: -0.045em;
+        font-size: 19px;
       }
 
       .card-number {
-        width: 42px;
-        height: 42px;
-        font-size: 14px;
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
       }
 
       .image-stage {
-        margin: 14px 0 18px;
+        min-height: min(58vh, 470px);
+        margin: 4px 0 10px;
         border-radius: 24px;
+        background: rgba(245, 245, 247, 0.34);
       }
 
       .image-stage img {
-        height: min(360px, 42vh);
+        height: min(58vh, 470px);
       }
 
       .card-bottom {
         display: grid;
-        gap: 14px;
+        gap: 10px;
       }
 
       .load-state.is-ready {
@@ -424,20 +469,27 @@
         display: grid;
         grid-template-columns: 1fr;
         width: 100%;
+        gap: 8px;
       }
 
       .button {
         width: 100%;
-        min-height: 52px;
-      }
-
-      .carousel-controls {
-        gap: 10px;
+        min-height: 50px;
+        font-size: 15px;
       }
 
       .nav-button {
-        width: 42px;
-        height: 42px;
+        width: 38px;
+        height: 38px;
+        opacity: 0.42;
+      }
+
+      .nav-button--prev {
+        left: 8px;
+      }
+
+      .nav-button--next {
+        right: 8px;
       }
     }
 
@@ -447,17 +499,21 @@
       }
 
       .product-card {
-        min-height: 620px;
-        padding: 18px;
+        min-height: min(640px, calc(100dvh - 118px));
+        padding: 13px;
         border-radius: 28px;
       }
 
       .card-title {
-        font-size: 24px;
+        font-size: 17px;
+      }
+
+      .image-stage {
+        min-height: min(56vh, 430px);
       }
 
       .image-stage img {
-        height: 320px;
+        height: min(56vh, 430px);
       }
     }
   </style>
@@ -475,19 +531,16 @@
 
     <section class="carousel-shell" aria-label="Карусель товаров Wildberries">
       <div class="carousel" id="carousel" tabindex="0" aria-label="Горизонтальный список карточек товаров"></div>
-      <div class="carousel-controls" aria-label="Навигация по товарам">
-        <button class="nav-button" type="button" id="prev-card" aria-label="Предыдущий товар">
-          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-            <path d="M11.4 3.3 5.7 9l5.7 5.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <div class="counter" id="card-counter" aria-live="polite">1 / 13</div>
-        <button class="nav-button" type="button" id="next-card" aria-label="Следующий товар">
-          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
-            <path d="m6.6 3.3 5.7 5.7-5.7 5.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
+      <button class="nav-button nav-button--prev" type="button" id="prev-card" aria-label="Предыдущий товар">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M12.6 4.1 6.7 10l5.9 5.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="nav-button nav-button--next" type="button" id="next-card" aria-label="Следующий товар">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="m7.4 4.1 5.9 5.9-5.9 5.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
     </section>
   </main>
 
@@ -509,7 +562,6 @@
     ];
 
     const carousel = document.querySelector('#carousel');
-    const counter = document.querySelector('#card-counter');
     const loadedCount = document.querySelector('#loaded-count');
     const totalProducts = document.querySelector('#total-products');
     const totalImages = document.querySelector('#total-images');
@@ -518,12 +570,14 @@
 
     let activeIndex = 0;
     let successfulImages = 0;
+    let scrollAnimation = null;
+    let wheelFrame = null;
+    let wheelTarget = 0;
     let wheelReleaseTimer;
 
     totalProducts.textContent = productLinks.length;
     totalImages.textContent = productLinks.length;
     loadedCount.textContent = successfulImages;
-    counter.textContent = `1 / ${productLinks.length}`;
 
     function getProductId(url) {
       const match = url.match(/\/catalog\/(\d+)\/detail\.aspx/i);
@@ -616,14 +670,14 @@
       const nmId = getProductId(url);
       const card = document.createElement('article');
       card.className = 'product-card';
-      card.style.animationDelay = `${index * 70}ms`;
+      card.style.animationDelay = `${index * 55}ms`;
       card.setAttribute('aria-label', `Товар ${index + 1} из ${productLinks.length}`);
 
       card.innerHTML = `
         <div class="card-top">
           <div>
-            <p class="card-kicker">Карточка ${index + 1} из ${productLinks.length}</p>
-            <h2 class="card-title">Товар Wildberries #${nmId}</h2>
+            <p class="card-kicker">Карточка ${index + 1}</p>
+            <h2 class="card-title">Wildberries #${nmId}</h2>
           </div>
           <div class="card-number">${index + 1}</div>
         </div>
@@ -651,10 +705,48 @@
       return Array.from(carousel.querySelectorAll('.product-card'));
     }
 
+    function easeOutQuint(progress) {
+      return 1 - Math.pow(1 - progress, 5);
+    }
+
+    function getTargetScrollForSlide(slide) {
+      return slide.offsetLeft - (carousel.clientWidth - slide.offsetWidth) / 2;
+    }
+
+    function animateScrollTo(targetLeft, duration = 820) {
+      if (scrollAnimation) {
+        window.cancelAnimationFrame(scrollAnimation);
+      }
+
+      const maxLeft = carousel.scrollWidth - carousel.clientWidth;
+      const clampedTarget = Math.max(0, Math.min(targetLeft, maxLeft));
+      const startLeft = carousel.scrollLeft;
+      const distance = clampedTarget - startLeft;
+      const startTime = performance.now();
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        carousel.scrollLeft = startLeft + distance * easeOutQuint(progress);
+
+        if (progress < 1) {
+          scrollAnimation = window.requestAnimationFrame(step);
+          return;
+        }
+
+        scrollAnimation = null;
+        updateActiveCard();
+      }
+
+      scrollAnimation = window.requestAnimationFrame(step);
+    }
+
     function scrollToCard(index) {
       const slides = getSlides();
       const nextIndex = Math.max(0, Math.min(index, slides.length - 1));
-      slides[nextIndex].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      const targetLeft = getTargetScrollForSlide(slides[nextIndex]);
+      wheelTarget = targetLeft;
+      animateScrollTo(targetLeft);
     }
 
     function updateActiveCard() {
@@ -673,13 +765,35 @@
       });
 
       activeIndex = closestIndex;
-      counter.textContent = `${activeIndex + 1} / ${slides.length}`;
       prevButton.disabled = activeIndex === 0;
       nextButton.disabled = activeIndex === slides.length - 1;
 
       slides.forEach((slide, index) => {
         slide.classList.toggle('is-active', index === activeIndex);
       });
+    }
+
+    function runWheelInertia() {
+      const distance = wheelTarget - carousel.scrollLeft;
+      carousel.scrollLeft += distance * 0.16;
+
+      if (Math.abs(distance) > 0.45) {
+        wheelFrame = window.requestAnimationFrame(runWheelInertia);
+        return;
+      }
+
+      carousel.scrollLeft = wheelTarget;
+      wheelFrame = null;
+      updateActiveCard();
+    }
+
+    function snapToNearestCard() {
+      const slides = getSlides();
+      if (!slides.length) {
+        return;
+      }
+
+      scrollToCard(activeIndex);
     }
 
     productLinks.forEach((url, index) => {
@@ -695,6 +809,7 @@
         return;
       }
 
+      const maxLeft = carousel.scrollWidth - carousel.clientWidth;
       const atStart = carousel.scrollLeft <= 0;
       const atEnd = Math.ceil(carousel.scrollLeft + carousel.clientWidth) >= carousel.scrollWidth;
       const scrollingPastStart = event.deltaY < 0 && atStart;
@@ -705,10 +820,30 @@
       }
 
       event.preventDefault();
-      carousel.scrollLeft += event.deltaY;
+      if (scrollAnimation) {
+        window.cancelAnimationFrame(scrollAnimation);
+        scrollAnimation = null;
+      }
+
+      if (!wheelFrame) {
+        wheelTarget = carousel.scrollLeft;
+      }
+      wheelTarget = Math.max(0, Math.min(wheelTarget + event.deltaY * 1.05, maxLeft));
+      if (!wheelFrame) {
+        wheelFrame = window.requestAnimationFrame(runWheelInertia);
+      }
+
       window.clearTimeout(wheelReleaseTimer);
-      wheelReleaseTimer = window.setTimeout(updateActiveCard, 80);
+      wheelReleaseTimer = window.setTimeout(snapToNearestCard, 190);
     }, { passive: false });
+
+    carousel.addEventListener('pointerdown', () => {
+      if (scrollAnimation) {
+        window.cancelAnimationFrame(scrollAnimation);
+        scrollAnimation = null;
+      }
+      wheelTarget = carousel.scrollLeft;
+    });
 
     prevButton.addEventListener('click', () => scrollToCard(activeIndex - 1));
     nextButton.addEventListener('click', () => scrollToCard(activeIndex + 1));
@@ -723,8 +858,13 @@
       }
     });
 
-    window.addEventListener('resize', updateActiveCard);
+    window.addEventListener('resize', () => {
+      updateActiveCard();
+      wheelTarget = carousel.scrollLeft;
+    });
+
     updateActiveCard();
+    wheelTarget = carousel.scrollLeft;
   </script>
 </body>
 </html>

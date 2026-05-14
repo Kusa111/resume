@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Сравнение Wildberries-предложений</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #667085;
+      --border: #e4e7ec;
+      --accent: #7f2cff;
+      --accent-dark: #6120c7;
+      --success: #087443;
+      --warning: #b54708;
+      --shadow: 0 14px 40px rgba(31, 41, 55, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(127, 44, 255, 0.10), transparent 34rem),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 28rem);
+    }
+
+    .page {
+      width: min(1440px, 100%);
+      margin: 0 auto;
+      padding: 36px 24px 48px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 980px;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .stat {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 6px 18px rgba(31, 41, 55, 0.05);
+    }
+
+    .stat strong {
+      font-size: 20px;
+      color: var(--accent-dark);
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      display: flex;
+      min-width: 0;
+      min-height: 100%;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .card__top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 14px 0;
+    }
+
+    .badge,
+    .nm-id {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .badge {
+      color: #ffffff;
+      background: var(--accent);
+    }
+
+    .nm-id {
+      color: var(--muted);
+      background: #f2f4f7;
+    }
+
+    .image-wrap {
+      display: grid;
+      place-items: center;
+      height: 260px;
+      margin: 14px;
+      padding: 12px;
+      border: 1px solid #eef0f4;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #fbfcff, #f7f8fb);
+    }
+
+    .image-wrap img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .placeholder {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 18px;
+      border: 1px dashed #cfd4dc;
+      border-radius: 14px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.45;
+      background: #ffffff;
+    }
+
+    .card__body {
+      display: grid;
+      gap: 12px;
+      padding: 0 14px 16px;
+    }
+
+    .card__title {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.35;
+    }
+
+    .status {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 7px;
+      color: var(--warning);
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .status::before {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+      content: "";
+    }
+
+    .status.is-success {
+      color: var(--success);
+    }
+
+    .status.is-muted {
+      color: var(--muted);
+    }
+
+    .open-link {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      min-height: 44px;
+      margin-top: auto;
+      padding: 11px 14px;
+      border-radius: 14px;
+      color: #ffffff;
+      background: var(--accent);
+      text-decoration: none;
+      font-weight: 750;
+      transition: transform 160ms ease, background 160ms ease;
+    }
+
+    .open-link:hover,
+    .open-link:focus-visible {
+      background: var(--accent-dark);
+      transform: translateY(-1px);
+    }
+
+    @media (max-width: 1180px) {
+      .grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 900px) {
+      .page {
+        padding: 28px 18px 38px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .image-wrap {
+        height: 230px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .image-wrap {
+        height: 210px;
+        margin: 12px;
+      }
+
+      .card__top,
+      .card__body {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+    }
+
+    @media (max-width: 430px) {
+      .page {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero" aria-labelledby="page-title">
+      <h1 id="page-title">Сравнение Wildberries-предложений: смешные маски на лицо</h1>
+      <p class="lead">Одна ссылка — одна карточка. Для карточек товаров изображения подбираются перебором basket-01…basket-40 в CDN Wildberries.</p>
+      <div class="stats" aria-live="polite">
+        <div class="stat"><strong id="total-count">0</strong><span>ссылок</span></div>
+        <div class="stat"><strong id="loaded-count">0</strong><span>изображений загружено</span></div>
+      </div>
+    </section>
+
+    <section class="grid" id="cards" aria-label="Карточки Wildberries-предложений"></section>
+  </main>
+
+  <script>
+    const links = [
+      'https://www.wildberries.ru/catalog/0/search.aspx?search=%D0%9C%D0%B0%D1%81%D0%BA%D0%B8%20%D1%81%D0%BC%D0%B5%D1%88%D0%BD%D1%8B%D0%B5%20%D0%BD%D0%B0%20%D0%BB%D0%B8%D1%86%D0%BE',
+      'https://www.wildberries.ru/catalog/338765677/detail.aspx',
+      'https://www.wildberries.ru/catalog/365454542/detail.aspx',
+      'https://www.wildberries.ru/catalog/275455439/detail.aspx',
+      'https://www.wildberries.ru/catalog/450959848/detail.aspx',
+      'https://www.wildberries.ru/catalog/381096286/detail.aspx',
+      'https://www.wildberries.ru/catalog/672395855/detail.aspx',
+      'https://www.wildberries.ru/catalog/303161769/detail.aspx',
+      'https://www.wildberries.ru/catalog/672395569/detail.aspx',
+      'https://www.wildberries.ru/catalog/374318753/detail.aspx',
+      'https://www.wildberries.ru/catalog/299387358/detail.aspx',
+      'https://www.wildberries.ru/catalog/478573487/detail.aspx',
+      'https://www.wildberries.ru/catalog/651139709/detail.aspx',
+      'https://www.wildberries.ru/catalog/484649071/detail.aspx'
+    ];
+
+    const cards = document.querySelector('#cards');
+    const totalCount = document.querySelector('#total-count');
+    const loadedCount = document.querySelector('#loaded-count');
+    let successfulImages = 0;
+
+    totalCount.textContent = links.length;
+    loadedCount.textContent = successfulImages;
+
+    function getProductId(url) {
+      const match = url.match(/\/catalog\/(\d+)\/detail\.aspx/i);
+      return match ? Number(match[1]) : null;
+    }
+
+    function getImageUrl(nmId, basket) {
+      const basketNumber = String(basket).padStart(2, '0');
+      const vol = Math.floor(nmId / 100000);
+      const part = Math.floor(nmId / 1000);
+      return `https://basket-${basketNumber}.wbbasket.ru/vol${vol}/part${part}/${nmId}/images/big/1.webp`;
+    }
+
+    function updateLoadedCount() {
+      loadedCount.textContent = successfulImages;
+    }
+
+    function setStatus(statusElement, text, state = 'muted') {
+      statusElement.textContent = text;
+      statusElement.classList.toggle('is-success', state === 'success');
+      statusElement.classList.toggle('is-muted', state === 'muted');
+    }
+
+    function showPlaceholder(container, text) {
+      container.innerHTML = '';
+      const placeholder = document.createElement('div');
+      placeholder.className = 'placeholder';
+      placeholder.textContent = text;
+      container.append(placeholder);
+    }
+
+    function loadProductImage(nmId, imageContainer, statusElement) {
+      let basket = 1;
+      const image = new Image();
+      image.alt = `Изображение товара ${nmId}`;
+
+      image.onload = () => {
+        imageContainer.innerHTML = '';
+        imageContainer.append(image);
+        successfulImages += 1;
+        updateLoadedCount();
+        setStatus(statusElement, `Изображение загружено: basket-${String(basket).padStart(2, '0')}`, 'success');
+      };
+
+      image.onerror = () => {
+        basket += 1;
+        if (basket <= 40) {
+          setStatus(statusElement, `Пробуем basket-${String(basket).padStart(2, '0')}…`);
+          image.src = getImageUrl(nmId, basket);
+          return;
+        }
+
+        showPlaceholder(imageContainer, 'Изображение не найдено');
+        setStatus(statusElement, 'Изображение не найдено');
+      };
+
+      setStatus(statusElement, 'Пробуем basket-01…');
+      image.src = getImageUrl(nmId, basket);
+    }
+
+    function createCard(url, index) {
+      const nmId = getProductId(url);
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      const title = nmId ? `Товар Wildberries #${nmId}` : 'Поисковая выдача Wildberries';
+      const idText = nmId ? `ID ${nmId}` : 'без ID';
+
+      card.innerHTML = `
+        <div class="card__top">
+          <span class="badge">Ссылка ${index + 1}</span>
+          <span class="nm-id">${idText}</span>
+        </div>
+        <div class="image-wrap" data-image-wrap></div>
+        <div class="card__body">
+          <h2 class="card__title">${title}</h2>
+          <span class="status is-muted" data-status>Ожидание загрузки</span>
+          <a class="open-link" href="${url}" target="_blank" rel="noopener noreferrer">Открыть на Wildberries</a>
+        </div>
+      `;
+
+      const imageContainer = card.querySelector('[data-image-wrap]');
+      const statusElement = card.querySelector('[data-status]');
+
+      if (nmId) {
+        loadProductImage(nmId, imageContainer, statusElement);
+      } else {
+        showPlaceholder(imageContainer, 'Поисковая страница: изображение не извлекается автоматически');
+        setStatus(statusElement, 'Поисковая выдача — без изображения', 'muted');
+      }
+
+      return card;
+    }
+
+    links.forEach((url, index) => {
+      cards.append(createCard(url, index));
+    });
+  </script>
+</body>
+</html>

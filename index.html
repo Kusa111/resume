@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wildberries Маски</title>
+  <style>
+    :root {
+      --page-bg: #f5f5f7;
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --text: #1d1d1f;
+      --muted: #86868b;
+      --line: rgba(29, 29, 31, 0.10);
+      --button: #1d1d1f;
+      --button-hover: #333336;
+      --shadow-active: 0 36px 96px rgba(0, 0, 0, 0.13);
+      --shadow-rest: 0 18px 54px rgba(0, 0, 0, 0.08);
+      --slide-width: min(930px, 78vw);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 50% -12%, rgba(255, 255, 255, 1) 0 23rem, transparent 40rem),
+        linear-gradient(180deg, #ffffff 0%, var(--page-bg) 48%, #ffffff 100%);
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100%, 1520px);
+      margin: 0 auto;
+      padding: 38px 0 46px;
+    }
+
+    .hero {
+      display: grid;
+      justify-items: center;
+      gap: 9px;
+      width: min(780px, calc(100% - 36px));
+      margin: 0 auto 22px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(40px, 6.4vw, 78px);
+      font-weight: 760;
+      line-height: 0.96;
+      letter-spacing: -0.065em;
+    }
+
+    .subtitle {
+      max-width: 580px;
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: clamp(17px, 1.8vw, 22px);
+      font-weight: 500;
+      line-height: 1.32;
+      letter-spacing: -0.02em;
+    }
+
+    .quiet-stats {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      min-height: 28px;
+      margin-top: 4px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.68);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.035);
+      font-size: 12px;
+      font-weight: 650;
+      backdrop-filter: blur(18px);
+    }
+
+    .quiet-stats strong {
+      color: var(--text);
+      font-weight: 750;
+    }
+
+    .carousel-shell {
+      position: relative;
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      overflow: hidden;
+    }
+
+    .carousel {
+      display: flex;
+      gap: clamp(18px, 3vw, 34px);
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 18px calc((100vw - var(--slide-width)) / 2) 34px;
+      scroll-behavior: smooth;
+      scroll-padding-inline: calc((100vw - var(--slide-width)) / 2);
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      scrollbar-width: none;
+      touch-action: pan-x pan-y;
+    }
+
+    .carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel::before,
+    .carousel::after {
+      position: sticky;
+      z-index: 2;
+      flex: 0 0 0;
+      width: 0;
+      pointer-events: none;
+      content: "";
+    }
+
+    .product-card {
+      position: relative;
+      display: grid;
+      flex: 0 0 var(--slide-width);
+      min-height: clamp(650px, 76vh, 840px);
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      overflow: hidden;
+      padding: clamp(18px, 2.8vw, 32px);
+      border: 1px solid var(--line);
+      border-radius: 38px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.90)),
+        var(--card-bg);
+      box-shadow: var(--shadow-rest);
+      scroll-snap-align: center;
+      transform: scale(0.925);
+      opacity: 0.54;
+      animation: cardReveal 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transition:
+        transform 620ms cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 620ms ease,
+        box-shadow 620ms ease,
+        border-color 620ms ease;
+      will-change: transform, opacity;
+    }
+
+    .product-card.is-active {
+      z-index: 1;
+      border-color: rgba(29, 29, 31, 0.16);
+      box-shadow: var(--shadow-active);
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .product-card.is-active:hover {
+        transform: translateY(-3px) scale(1.006);
+        box-shadow: 0 42px 110px rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    @keyframes cardReveal {
+      from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.91);
+      }
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      min-width: 0;
+      padding: 2px 2px 0;
+    }
+
+    .card-kicker {
+      margin: 0 0 5px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    .card-title {
+      margin: 0;
+      color: var(--text);
+      font-size: clamp(18px, 2.3vw, 26px);
+      font-weight: 720;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+    }
+
+    .card-number {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--muted);
+      background: rgba(245, 245, 247, 0.64);
+      font-size: 13px;
+      font-weight: 760;
+    }
+
+    .image-stage {
+      display: grid;
+      place-items: center;
+      min-height: min(68vh, 720px);
+      margin: clamp(6px, 1.5vw, 16px) 0 clamp(10px, 1.7vw, 18px);
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(245, 245, 247, 0.42), rgba(255, 255, 255, 0.18));
+    }
+
+    .image-stage img {
+      display: block;
+      width: 100%;
+      height: min(68vh, 720px);
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 24px 42px rgba(0, 0, 0, 0.13));
+    }
+
+    .placeholder {
+      display: grid;
+      place-items: center;
+      width: min(100%, 520px);
+      min-height: 320px;
+      padding: 28px;
+      border: 1px dashed rgba(29, 29, 31, 0.16);
+      border-radius: 28px;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.56);
+      text-align: center;
+      font-size: 17px;
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 0 2px 2px;
+    }
+
+    .load-state {
+      min-width: 110px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+      transition: opacity 220ms ease;
+    }
+
+    .load-state.is-ready {
+      opacity: 0;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 9px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 10px 16px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 720;
+      cursor: pointer;
+      transition: transform 200ms ease, background 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+    }
+
+    .button:focus-visible,
+    .nav-button:focus-visible {
+      outline: 3px solid rgba(29, 29, 31, 0.16);
+      outline-offset: 3px;
+    }
+
+    .button--primary {
+      color: #ffffff;
+      background: var(--button);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.14);
+    }
+
+    .button--primary:hover {
+      background: var(--button-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 15px 28px rgba(0, 0, 0, 0.17);
+    }
+
+    .button--secondary {
+      color: var(--text);
+      background: rgba(245, 245, 247, 0.78);
+      border-color: var(--line);
+    }
+
+    .button--secondary:hover {
+      background: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .nav-button {
+      position: absolute;
+      top: 50%;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border: 1px solid rgba(29, 29, 31, 0.10);
+      border-radius: 50%;
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.58);
+      box-shadow: 0 16px 38px rgba(0, 0, 0, 0.12);
+      cursor: pointer;
+      transform: translateY(-50%);
+      transition: transform 220ms ease, background 220ms ease, opacity 220ms ease, box-shadow 220ms ease;
+      backdrop-filter: blur(22px) saturate(180%);
+    }
+
+    .nav-button--prev {
+      left: max(18px, calc((100vw - var(--slide-width)) / 2 - 82px));
+    }
+
+    .nav-button--next {
+      right: max(18px, calc((100vw - var(--slide-width)) / 2 - 82px));
+    }
+
+    .nav-button:hover {
+      background: rgba(255, 255, 255, 0.82);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.14);
+      transform: translateY(-50%) scale(1.04);
+    }
+
+    .nav-button:disabled {
+      opacity: 0.18;
+      cursor: default;
+      transform: translateY(-50%) scale(0.96);
+    }
+
+    @media (max-width: 760px) {
+      :root {
+        --slide-width: min(430px, 90vw);
+      }
+
+      .page {
+        padding: 24px 0 28px;
+      }
+
+      .hero {
+        width: min(100% - 28px, 560px);
+        gap: 7px;
+        margin-bottom: 12px;
+      }
+
+      .eyebrow {
+        font-size: 12px;
+      }
+
+      h1 {
+        font-size: clamp(36px, 12vw, 54px);
+        letter-spacing: -0.06em;
+      }
+
+      .subtitle {
+        max-width: 330px;
+        font-size: 16px;
+      }
+
+      .quiet-stats {
+        min-height: 26px;
+        padding: 5px 10px;
+        font-size: 11px;
+      }
+
+      .carousel {
+        gap: 14px;
+        padding-top: 10px;
+        padding-bottom: 20px;
+      }
+
+      .product-card {
+        min-height: min(680px, calc(100dvh - 128px));
+        padding: 15px;
+        border-radius: 30px;
+        transform: scale(0.965);
+        opacity: 0.72;
+      }
+
+      .product-card.is-active {
+        transform: scale(1);
+      }
+
+      .card-top {
+        gap: 10px;
+      }
+
+      .card-kicker {
+        margin-bottom: 3px;
+        font-size: 12px;
+      }
+
+      .card-title {
+        font-size: 19px;
+      }
+
+      .card-number {
+        width: 34px;
+        height: 34px;
+        font-size: 12px;
+      }
+
+      .image-stage {
+        min-height: min(58vh, 470px);
+        margin: 4px 0 10px;
+        border-radius: 24px;
+        background: rgba(245, 245, 247, 0.34);
+      }
+
+      .image-stage img {
+        height: min(58vh, 470px);
+      }
+
+      .card-bottom {
+        display: grid;
+        gap: 10px;
+      }
+
+      .load-state.is-ready {
+        display: none;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+        gap: 8px;
+      }
+
+      .button {
+        width: 100%;
+        min-height: 50px;
+        font-size: 15px;
+      }
+
+      .nav-button {
+        width: 38px;
+        height: 38px;
+        opacity: 0.42;
+      }
+
+      .nav-button--prev {
+        left: 8px;
+      }
+
+      .nav-button--next {
+        right: 8px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      :root {
+        --slide-width: 91vw;
+      }
+
+      .product-card {
+        min-height: min(640px, calc(100dvh - 118px));
+        padding: 13px;
+        border-radius: 28px;
+      }
+
+      .card-title {
+        font-size: 17px;
+      }
+
+      .image-stage {
+        min-height: min(56vh, 430px);
+      }
+
+      .image-stage img {
+        height: min(56vh, 430px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow"><span id="total-products">13</span> товаров для быстрого сравнения</p>
+      <h1 id="page-title">Wildberries Маски</h1>
+      <p class="subtitle">Визуальное сравнение товаров в одном минималистичном каталоге.</p>
+      <div class="quiet-stats" aria-live="polite">
+        <strong id="loaded-count">0</strong><span>из <span id="total-images">13</span> изображений готово</span>
+      </div>
+    </section>
+
+    <section class="carousel-shell" aria-label="Карусель товаров Wildberries">
+      <div class="carousel" id="carousel" tabindex="0" aria-label="Горизонтальный список карточек товаров"></div>
+      <button class="nav-button nav-button--prev" type="button" id="prev-card" aria-label="Предыдущий товар">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M12.6 4.1 6.7 10l5.9 5.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="nav-button nav-button--next" type="button" id="next-card" aria-label="Следующий товар">
+        <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="m7.4 4.1 5.9 5.9-5.9 5.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </section>
+  </main>
+
+  <script>
+    const productLinks = [
+      'https://www.wildberries.ru/catalog/338765677/detail.aspx',
+      'https://www.wildberries.ru/catalog/365454542/detail.aspx',
+      'https://www.wildberries.ru/catalog/275455439/detail.aspx',
+      'https://www.wildberries.ru/catalog/450959848/detail.aspx',
+      'https://www.wildberries.ru/catalog/381096286/detail.aspx',
+      'https://www.wildberries.ru/catalog/672395855/detail.aspx',
+      'https://www.wildberries.ru/catalog/303161769/detail.aspx',
+      'https://www.wildberries.ru/catalog/672395569/detail.aspx',
+      'https://www.wildberries.ru/catalog/374318753/detail.aspx',
+      'https://www.wildberries.ru/catalog/299387358/detail.aspx',
+      'https://www.wildberries.ru/catalog/478573487/detail.aspx',
+      'https://www.wildberries.ru/catalog/651139709/detail.aspx',
+      'https://www.wildberries.ru/catalog/484649071/detail.aspx'
+    ];
+
+    const carousel = document.querySelector('#carousel');
+    const loadedCount = document.querySelector('#loaded-count');
+    const totalProducts = document.querySelector('#total-products');
+    const totalImages = document.querySelector('#total-images');
+    const prevButton = document.querySelector('#prev-card');
+    const nextButton = document.querySelector('#next-card');
+
+    let activeIndex = 0;
+    let successfulImages = 0;
+    let scrollAnimation = null;
+    let wheelFrame = null;
+    let wheelTarget = 0;
+    let wheelReleaseTimer;
+
+    totalProducts.textContent = productLinks.length;
+    totalImages.textContent = productLinks.length;
+    loadedCount.textContent = successfulImages;
+
+    function getProductId(url) {
+      const match = url.match(/\/catalog\/(\d+)\/detail\.aspx/i);
+      return match ? Number(match[1]) : null;
+    }
+
+    function getImageUrl(nmId, basket) {
+      const basketNumber = String(basket).padStart(2, '0');
+      const vol = Math.floor(nmId / 100000);
+      const part = Math.floor(nmId / 1000);
+      return `https://basket-${basketNumber}.wbbasket.ru/vol${vol}/part${part}/${nmId}/images/big/1.webp`;
+    }
+
+    function setImageState(statusElement, text, isReady = false) {
+      statusElement.textContent = text;
+      statusElement.classList.toggle('is-ready', isReady);
+    }
+
+    function showPlaceholder(container) {
+      container.innerHTML = '';
+      const placeholder = document.createElement('div');
+      placeholder.className = 'placeholder';
+      placeholder.textContent = 'Изображение не найдено';
+      container.append(placeholder);
+    }
+
+    function loadProductImage(nmId, imageContainer, statusElement) {
+      let basket = 1;
+      const image = new Image();
+      image.alt = `Товар Wildberries #${nmId}`;
+
+      image.onload = () => {
+        imageContainer.innerHTML = '';
+        imageContainer.append(image);
+        successfulImages += 1;
+        loadedCount.textContent = successfulImages;
+        setImageState(statusElement, 'Изображение готово', true);
+      };
+
+      image.onerror = () => {
+        basket += 1;
+        if (basket <= 40) {
+          image.src = getImageUrl(nmId, basket);
+          return;
+        }
+
+        showPlaceholder(imageContainer);
+        setImageState(statusElement, 'Изображение не найдено');
+      };
+
+      setImageState(statusElement, 'Загружаем изображение…');
+      image.src = getImageUrl(nmId, basket);
+    }
+
+    function copyLink(url, button) {
+      const originalText = button.textContent;
+
+      function markCopied() {
+        button.textContent = 'Ссылка скопирована';
+        window.setTimeout(() => {
+          button.textContent = originalText;
+        }, 1700);
+      }
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(url).then(markCopied).catch(() => fallbackCopy(url, markCopied));
+        return;
+      }
+
+      fallbackCopy(url, markCopied);
+    }
+
+    function fallbackCopy(url, onSuccess) {
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.setAttribute('readonly', '');
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.append(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        onSuccess();
+      } finally {
+        textArea.remove();
+      }
+    }
+
+    function createProductCard(url, index) {
+      const nmId = getProductId(url);
+      const card = document.createElement('article');
+      card.className = 'product-card';
+      card.style.animationDelay = `${index * 55}ms`;
+      card.setAttribute('aria-label', `Товар ${index + 1} из ${productLinks.length}`);
+
+      card.innerHTML = `
+        <div class="card-top">
+          <div>
+            <p class="card-kicker">Карточка ${index + 1}</p>
+            <h2 class="card-title">Wildberries #${nmId}</h2>
+          </div>
+          <div class="card-number">${index + 1}</div>
+        </div>
+        <div class="image-stage" data-image-stage></div>
+        <div class="card-bottom">
+          <div class="load-state" data-status aria-live="polite">Загружаем изображение…</div>
+          <div class="actions">
+            <button class="button button--secondary" type="button" data-copy>Скопировать ссылку</button>
+            <a class="button button--primary" href="${url}" target="_blank" rel="noopener noreferrer">Открыть на Wildberries</a>
+          </div>
+        </div>
+      `;
+
+      const imageContainer = card.querySelector('[data-image-stage]');
+      const statusElement = card.querySelector('[data-status]');
+      const copyButton = card.querySelector('[data-copy]');
+
+      copyButton.addEventListener('click', () => copyLink(url, copyButton));
+      loadProductImage(nmId, imageContainer, statusElement);
+
+      return card;
+    }
+
+    function getSlides() {
+      return Array.from(carousel.querySelectorAll('.product-card'));
+    }
+
+    function easeOutQuint(progress) {
+      return 1 - Math.pow(1 - progress, 5);
+    }
+
+    function getTargetScrollForSlide(slide) {
+      return slide.offsetLeft - (carousel.clientWidth - slide.offsetWidth) / 2;
+    }
+
+    function animateScrollTo(targetLeft, duration = 820) {
+      if (scrollAnimation) {
+        window.cancelAnimationFrame(scrollAnimation);
+      }
+
+      const maxLeft = carousel.scrollWidth - carousel.clientWidth;
+      const clampedTarget = Math.max(0, Math.min(targetLeft, maxLeft));
+      const startLeft = carousel.scrollLeft;
+      const distance = clampedTarget - startLeft;
+      const startTime = performance.now();
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        carousel.scrollLeft = startLeft + distance * easeOutQuint(progress);
+
+        if (progress < 1) {
+          scrollAnimation = window.requestAnimationFrame(step);
+          return;
+        }
+
+        scrollAnimation = null;
+        updateActiveCard();
+      }
+
+      scrollAnimation = window.requestAnimationFrame(step);
+    }
+
+    function scrollToCard(index) {
+      const slides = getSlides();
+      const nextIndex = Math.max(0, Math.min(index, slides.length - 1));
+      const targetLeft = getTargetScrollForSlide(slides[nextIndex]);
+      wheelTarget = targetLeft;
+      animateScrollTo(targetLeft);
+    }
+
+    function updateActiveCard() {
+      const slides = getSlides();
+      const carouselCenter = carousel.scrollLeft + carousel.clientWidth / 2;
+      let closestIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
+
+      slides.forEach((slide, index) => {
+        const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+        const distance = Math.abs(slideCenter - carouselCenter);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      activeIndex = closestIndex;
+      prevButton.disabled = activeIndex === 0;
+      nextButton.disabled = activeIndex === slides.length - 1;
+
+      slides.forEach((slide, index) => {
+        slide.classList.toggle('is-active', index === activeIndex);
+      });
+    }
+
+    function runWheelInertia() {
+      const distance = wheelTarget - carousel.scrollLeft;
+      carousel.scrollLeft += distance * 0.16;
+
+      if (Math.abs(distance) > 0.45) {
+        wheelFrame = window.requestAnimationFrame(runWheelInertia);
+        return;
+      }
+
+      carousel.scrollLeft = wheelTarget;
+      wheelFrame = null;
+      updateActiveCard();
+    }
+
+    function snapToNearestCard() {
+      const slides = getSlides();
+      if (!slides.length) {
+        return;
+      }
+
+      scrollToCard(activeIndex);
+    }
+
+    productLinks.forEach((url, index) => {
+      carousel.append(createProductCard(url, index));
+    });
+
+    carousel.addEventListener('scroll', () => {
+      window.requestAnimationFrame(updateActiveCard);
+    }, { passive: true });
+
+    carousel.addEventListener('wheel', (event) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) {
+        return;
+      }
+
+      const maxLeft = carousel.scrollWidth - carousel.clientWidth;
+      const atStart = carousel.scrollLeft <= 0;
+      const atEnd = Math.ceil(carousel.scrollLeft + carousel.clientWidth) >= carousel.scrollWidth;
+      const scrollingPastStart = event.deltaY < 0 && atStart;
+      const scrollingPastEnd = event.deltaY > 0 && atEnd;
+
+      if (scrollingPastStart || scrollingPastEnd) {
+        return;
+      }
+
+      event.preventDefault();
+      if (scrollAnimation) {
+        window.cancelAnimationFrame(scrollAnimation);
+        scrollAnimation = null;
+      }
+
+      if (!wheelFrame) {
+        wheelTarget = carousel.scrollLeft;
+      }
+      wheelTarget = Math.max(0, Math.min(wheelTarget + event.deltaY * 1.05, maxLeft));
+      if (!wheelFrame) {
+        wheelFrame = window.requestAnimationFrame(runWheelInertia);
+      }
+
+      window.clearTimeout(wheelReleaseTimer);
+      wheelReleaseTimer = window.setTimeout(snapToNearestCard, 190);
+    }, { passive: false });
+
+    carousel.addEventListener('pointerdown', () => {
+      if (scrollAnimation) {
+        window.cancelAnimationFrame(scrollAnimation);
+        scrollAnimation = null;
+      }
+      wheelTarget = carousel.scrollLeft;
+    });
+
+    prevButton.addEventListener('click', () => scrollToCard(activeIndex - 1));
+    nextButton.addEventListener('click', () => scrollToCard(activeIndex + 1));
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        scrollToCard(activeIndex - 1);
+      }
+
+      if (event.key === 'ArrowRight') {
+        scrollToCard(activeIndex + 1);
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      updateActiveCard();
+      wheelTarget = carousel.scrollLeft;
+    });
+
+    updateActiveCard();
+    wheelTarget = carousel.scrollLeft;
+  </script>
+</body>
+</html>

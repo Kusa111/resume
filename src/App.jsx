@@ -6,8 +6,7 @@ import { getTodayKey, loadTasks } from './lib/tasks';
 const tabs = [
   { id: 'train', label: 'Тренировка' },
   { id: 'stats', label: 'Статистика' },
-  { id: 'favorites', label: 'Избранное' },
-  { id: 'review', label: 'Повторение' }
+  { id: 'favorites', label: 'Избранное' }
 ];
 
 const getRandomIndex = (length, previousIndex = -1) => {
@@ -26,7 +25,6 @@ export function App() {
   const [taskIndex, setTaskIndex] = useState(() => getRandomIndex(tasks.length));
   const [userAnswer, setUserAnswer] = useState('');
   const [feedback, setFeedback] = useState(null);
-  const [reviewIndex, setReviewIndex] = useState(0);
 
   const currentTask = tasks[taskIndex % tasks.length];
   const todayStats = statsByDate[getTodayKey()] || { solved: 0, correct: 0, wrong: 0 };
@@ -94,7 +92,7 @@ export function App() {
         {activeTab === 'train' && <section className="panel train-panel centered-panel">
           <div className="section-head">
             <div><span className="muted">Источник</span><h2>{currentTask.source}</h2></div>
-            <span className="counter">случайная подборка</span>
+            <span className="counter">{tasks.length} заданий</span>
           </div>
 
           <div className="task-card">
@@ -121,8 +119,6 @@ export function App() {
         {activeTab === 'stats' && <section className="panel centered-panel"><div className="section-head"><div><span className="muted">Прогресс</span><h2>Статистика по дням</h2></div></div>{Object.keys(statsByDate).length === 0 ? <Empty text="Пока нет решённых заданий." /> : <div className="stat-grid">{Object.entries(statsByDate).sort((a, b) => b[0].localeCompare(a[0])).map(([date, s]) => <div className="stat-card" key={date}><b>{date}</b><span>Решено: {s.solved}</span><span>Верно: {s.correct}</span><span>Ошибок: {s.wrong}</span><strong>{s.solved ? Math.round((s.correct / s.solved) * 100) : 0}%</strong></div>)}</div>}</section>}
 
         {activeTab === 'favorites' && <section className="panel centered-panel"><div className="section-head"><div><span className="muted">Сохранённое</span><h2>Избранные паронимы</h2></div></div>{favorites.length === 0 ? <Empty text="Сохраняй сложные пары после проверки ответа." /> : <div className="list">{favorites.map((lemma) => <div key={lemma} className="list-item"><div><b>{lemma} — {paronymDictionary[lemma]?.pair}</b><p>{paronymDictionary[lemma]?.explanation}</p></div><button className="secondary" onClick={() => toggleFavorite(lemma)}>Удалить</button></div>)}</div>}</section>}
-
-        {activeTab === 'review' && <section className="panel centered-panel"><div className="section-head"><div><span className="muted">Карточки</span><h2>Повторение избранного</h2></div></div>{favorites.length === 0 ? <Empty text="В избранном пока нет паронимов." /> : <div className="review-card"><span>{(reviewIndex % favorites.length) + 1} / {favorites.length}</span><h3>{favorites[reviewIndex % favorites.length]}</h3><details><summary>Показать значение</summary><p>{paronymDictionary[favorites[reviewIndex % favorites.length]]?.explanation}</p></details><button className="primary" onClick={() => setReviewIndex((i) => i + 1)}>Следующая карточка</button></div>}</section>}
       </main>
 
       <nav className="mobile-nav site-nav">{tabs.map((tab) => <button key={tab.id} className={activeTab === tab.id ? 'active' : ''} onClick={() => setActiveTab(tab.id)}>{tab.label}</button>)}</nav>

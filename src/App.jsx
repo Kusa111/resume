@@ -3,10 +3,15 @@ import { paronymDictionary } from './data/paronyms';
 import { storage } from './lib/storage';
 import { generateTask, getTodayKey, loadTasks } from './lib/tasks';
 
-const tabs = ['Тренировка', 'Статистика', 'Избранное', 'Повторение'];
+const tabs = [
+  { id: 'train', label: 'Тренировка' },
+  { id: 'stats', label: 'Статистика' },
+  { id: 'favorites', label: 'Избранное' },
+  { id: 'review', label: 'Повторение' }
+];
 
 export function App() {
-  const [activeTab, setActiveTab] = useState('Тренировка');
+  const [activeTab, setActiveTab] = useState('train');
   const [favorites, setFavorites] = useState(storage.getFavorites());
   const [statsByDate, setStatsByDate] = useState(storage.getStats());
   const [customTasks, setCustomTasks] = useState(storage.getCustomTasks());
@@ -17,6 +22,8 @@ export function App() {
 
   const tasks = useMemo(() => loadTasks(customTasks), [customTasks]);
   const currentTask = tasks[taskIndex % tasks.length];
+  const todayStats = statsByDate[getTodayKey()] || { solved: 0, correct: 0, wrong: 0 };
+  const accuracy = todayStats.solved ? Math.round((todayStats.correct / todayStats.solved) * 100) : 0;
 
   const addStat = (isCorrect) => {
     const key = getTodayKey();
@@ -34,15 +41,19 @@ export function App() {
   };
 
   const submitAnswer = () => {
+    if (!userAnswer.trim()) return;
     const normalized = userAnswer.trim().toLowerCase();
     const correct = currentTask.correct.toLowerCase();
     const isCorrect = normalized === correct;
+    const info = paronymDictionary[currentTask.lemma] || {};
     addStat(isCorrect);
-
-    const explanation = paronymDictionary[currentTask.lemma]?.explanation || 'Краткое объяснение пока не добавлено.';
-    const pairWord = paronymDictionary[currentTask.lemma]?.pair || '—';
-
-    setFeedback({ isCorrect, correct: currentTask.correct, pair: `${currentTask.lemma} — ${pairWord}`, explanation, lemma: currentTask.lemma });
+    setFeedback({
+      isCorrect,
+      correct: currentTask.correct,
+      pair: `${currentTask.lemma} — ${info.pair || '—'}`,
+      explanation: info.explanation || 'Краткое объяснение пока не добавлено.',
+      lemma: currentTask.lemma
+    });
   };
 
   const nextTask = () => {
@@ -65,7 +76,6 @@ export function App() {
     const wrong = form.get('wrong').toString().trim().toLowerCase();
     const sentence = form.get('sentence').toString().trim();
     if (!lemma || !correct || !wrong || !sentence) return;
-
     const task = { id: `c-${Date.now()}`, source: 'Ручное добавление', sentence, options: [correct, wrong], correct, lemma };
     const next = [...customTasks, task];
     setCustomTasks(next);
@@ -73,13 +83,79 @@ export function App() {
     e.currentTarget.reset();
   };
 
-  return <div className="app">{activeTab==='Тренировка' && <section className="card"><h1>ЕГЭ-2026: Задание №5 (паронимы)</h1><p>{currentTask.sentence}</p><div className="options">{currentTask.options.map((o)=><button key={o} className={userAnswer===o?'selected':''} onClick={()=>setUserAnswer(o)}>{o}</button>)}</div><input placeholder="Или введите ответ" value={userAnswer} onChange={(e)=>setUserAnswer(e.target.value)} /> <button onClick={submitAnswer}>Проверить</button> <button onClick={nextTask}>Следующее</button><small>Источник: {currentTask.source}. Подгрузка «свежих» заданий выполняется через ручное добавление или API-адаптер.</small>{feedback && <div className={`feedback ${feedback.isCorrect?'ok':'bad'}`}><h3>{feedback.isCorrect?'Верно':'Неверно'}</h3><p>Правильный ответ: <b>{feedback.correct}</b></p><p>Пара паронимов: <b>{feedback.pair}</b></p><p>{feedback.explanation}</p><button onClick={()=>toggleFavorite(feedback.lemma)}>{favorites.includes(feedback.lemma)?'❤️ Убрать':'🤍 В избранное'}</button></div>}<form onSubmit={addCustomTask} className="inline-form"><h3>Добавить новое задание вручную</h3><input name="sentence" placeholder="Формулировка задания"/><input name="lemma" placeholder="Лемма (напр. стеклянный)"/><input name="correct" placeholder="Правильный вариант"/><input name="wrong" placeholder="Неправильный пароним"/><button type="submit">Добавить</button><button type="button" onClick={()=>setCustomTasks((prev)=>{const next=[...prev, generateTask()]; storage.setCustomTasks(next); return next;})}>+ Сгенерировать задание</button></form></section>}
+  return (
+    <div className="app-shell">
+      <aside className="sidebar">
+        <div className="brand">
+          <div className="brand-mark">5</div>
+          <div>
+            <p>ЕГЭ-2026</p>
+            <strong>Паронимы</strong>
+          </div>
+        </div>
+        <nav className="desktop-nav">
+          {tabs.map((tab) => <button key={tab.id} className={activeTab === tab.id ? 'active' : ''} onClick={() => setActiveTab(tab.id)}>{tab.label}</button>)}
+        </nav>
+      </aside>
 
-{activeTab==='Статистика' && <section className="card"><h2>Статистика по датам</h2>{Object.keys(statsByDate).length===0?<p>Пока нет данных.</p>:Object.entries(statsByDate).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,s])=>{const pct=s.solved?Math.round((s.correct/s.solved)*100):0; return <div key={date} className="stat-row"><b>{date}</b><span>Решено: {s.solved}</span><span>Верно: {s.correct}</span><span>Ошибок: {s.wrong}</span><span>{pct}%</span></div>;})}</section>}
+      <main className="main">
+        <section className="hero-card">
+          <div>
+            <span className="badge">Русский язык · задание №5</span>
+            <h1>Тренажёр паронимов</h1>
+            <p>Выбирай правильный пароним, сразу смотри короткое объяснение и сохраняй сложные пары для повторения.</p>
+          </div>
+          <div className="today-panel">
+            <span>Сегодня</span>
+            <strong>{todayStats.solved}</strong>
+            <p>{accuracy}% точность</p>
+          </div>
+        </section>
 
-{activeTab==='Избранное' && <section className="card"><h2>Избранные паронимы</h2>{favorites.length===0?<p>Пока пусто.</p>:favorites.map((lemma)=><div key={lemma} className="fav-row"><div><b>{lemma} — {paronymDictionary[lemma]?.pair}</b><p>{paronymDictionary[lemma]?.explanation}</p></div><button onClick={()=>toggleFavorite(lemma)}>Удалить</button></div>)}</section>}
+        {activeTab === 'train' && <section className="panel train-panel">
+          <div className="section-head">
+            <div><span className="muted">Источник</span><h2>{currentTask.source}</h2></div>
+            <span className="counter">{(taskIndex % tasks.length) + 1} / {tasks.length}</span>
+          </div>
 
-{activeTab==='Повторение' && <section className="card"><h2>Повторение (карточки)</h2>{favorites.length===0?<p>Добавьте паронимы в избранное.</p>:<div><p><b>{favorites[reviewIndex % favorites.length]}</b></p><details><summary>Показать значение</summary><p>{paronymDictionary[favorites[reviewIndex % favorites.length]]?.explanation}</p></details><button onClick={()=>setReviewIndex((i)=>i+1)}>Следующая карточка</button></div>}</section>}
+          <div className="task-card">
+            <p className="task-label">Выберите подходящий пароним</p>
+            <p className="sentence">{currentTask.sentence}</p>
+            <div className="options">
+              {currentTask.options.map((option) => <button key={option} className={userAnswer === option ? 'option selected' : 'option'} onClick={() => setUserAnswer(option)}>{option}</button>)}
+            </div>
+            <div className="answer-bar">
+              <input placeholder="Или введите ответ вручную" value={userAnswer} onChange={(e) => setUserAnswer(e.target.value)} />
+              <button className="primary" onClick={submitAnswer}>Проверить</button>
+              <button className="secondary" onClick={nextTask}>Следующее</button>
+            </div>
+          </div>
 
-<nav className="tabs">{tabs.map((t)=><button key={t} className={activeTab===t?'active':''} onClick={()=>setActiveTab(t)}>{t}</button>)}</nav></div>;
+          {feedback && <div className={feedback.isCorrect ? 'feedback ok' : 'feedback bad'}>
+            <div><span>{feedback.isCorrect ? 'Верно' : 'Неверно'}</span><h3>Правильный ответ: {feedback.correct}</h3></div>
+            <p><b>{feedback.pair}</b></p>
+            <p>{feedback.explanation}</p>
+            <button className="favorite-btn" onClick={() => toggleFavorite(feedback.lemma)}>{favorites.includes(feedback.lemma) ? '❤️ В избранном' : '🤍 Добавить в избранное'}</button>
+          </div>}
+
+          <form onSubmit={addCustomTask} className="add-card">
+            <div><h3>Добавить своё задание</h3><p>Для новых заданий с ФИПИ, Школково или Умскул.</p></div>
+            <input name="sentence" placeholder="Формулировка задания" />
+            <div className="form-grid"><input name="lemma" placeholder="Лемма: стеклянный" /><input name="correct" placeholder="Правильный вариант" /><input name="wrong" placeholder="Неверный пароним" /></div>
+            <div className="form-actions"><button className="secondary" type="submit">Добавить</button><button className="ghost" type="button" onClick={() => setCustomTasks((prev) => { const next = [...prev, generateTask()]; storage.setCustomTasks(next); return next; })}>Сгенерировать</button></div>
+          </form>
+        </section>}
+
+        {activeTab === 'stats' && <section className="panel"><div className="section-head"><div><span className="muted">Прогресс</span><h2>Статистика по дням</h2></div></div>{Object.keys(statsByDate).length === 0 ? <Empty text="Пока нет решённых заданий." /> : <div className="stat-grid">{Object.entries(statsByDate).sort((a, b) => b[0].localeCompare(a[0])).map(([date, s]) => <div className="stat-card" key={date}><b>{date}</b><span>Решено: {s.solved}</span><span>Верно: {s.correct}</span><span>Ошибок: {s.wrong}</span><strong>{s.solved ? Math.round((s.correct / s.solved) * 100) : 0}%</strong></div>)}</div>}</section>}
+
+        {activeTab === 'favorites' && <section className="panel"><div className="section-head"><div><span className="muted">Сохранённое</span><h2>Избранные паронимы</h2></div></div>{favorites.length === 0 ? <Empty text="Сохраняй сложные пары после проверки ответа." /> : <div className="list">{favorites.map((lemma) => <div key={lemma} className="list-item"><div><b>{lemma} — {paronymDictionary[lemma]?.pair}</b><p>{paronymDictionary[lemma]?.explanation}</p></div><button className="secondary" onClick={() => toggleFavorite(lemma)}>Удалить</button></div>)}</div>}</section>}
+
+        {activeTab === 'review' && <section className="panel"><div className="section-head"><div><span className="muted">Карточки</span><h2>Повторение избранного</h2></div></div>{favorites.length === 0 ? <Empty text="В избранном пока нет паронимов." /> : <div className="review-card"><span>{reviewIndex + 1} / {favorites.length}</span><h3>{favorites[reviewIndex % favorites.length]}</h3><details><summary>Показать значение</summary><p>{paronymDictionary[favorites[reviewIndex % favorites.length]]?.explanation}</p></details><button className="primary" onClick={() => setReviewIndex((i) => i + 1)}>Следующая карточка</button></div>}</section>}
+      </main>
+
+      <nav className="mobile-nav">{tabs.map((tab) => <button key={tab.id} className={activeTab === tab.id ? 'active' : ''} onClick={() => setActiveTab(tab.id)}>{tab.label}</button>)}</nav>
+    </div>
+  );
 }
+
+function Empty({ text }) { return <div className="empty"><p>{text}</p></div>; }

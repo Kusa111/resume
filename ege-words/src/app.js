@@ -24,7 +24,7 @@ const els = {
   successBanner: document.querySelector('#success-banner')
 };
 
-const normalize = (value) => value.trim().toLocaleLowerCase('ru-RU').replace(/йо/g, 'ё');
+const normalize = (value) => String(value || '').trim().toLocaleLowerCase('ru-RU').replace(/йо/g, 'ё');
 const bestKey = (mode) => `ege-words:best-streak:${mode}`;
 const getBest = (mode) => Number(localStorage.getItem(bestKey(mode)) || 0);
 const setBest = (mode, value) => localStorage.setItem(bestKey(mode), String(value));
@@ -47,18 +47,24 @@ function formatTime(ms) {
   return `${minutes}:${seconds}`;
 }
 
+function tickTimer() {
+  if (!state.startedAt || !els.timer) return;
+  els.timer.textContent = formatTime(Date.now() - state.startedAt);
+}
+
 function startTimer() {
   window.clearInterval(state.timerId);
   state.startedAt = Date.now();
-  els.timer.textContent = '00:00';
-  state.timerId = window.setInterval(() => {
-    els.timer.textContent = formatTime(Date.now() - state.startedAt);
-  }, 1000);
+  tickTimer();
+  state.timerId = window.setInterval(tickTimer, 1000);
 }
 
 function startMode(mode) {
+  const deck = tasks[mode] || [];
+  if (!deck.length) return;
+
   state.mode = mode;
-  state.deck = shuffle(tasks[mode]);
+  state.deck = shuffle(deck);
   state.index = 0;
   state.streak = 0;
   state.locked = false;
@@ -68,7 +74,8 @@ function startMode(mode) {
   renderTask();
 }
 
-function showModes() {
+function showModes(event) {
+  if (event) event.preventDefault();
   els.trainerScreen.classList.add('hidden');
   els.modeScreen.classList.remove('hidden');
   state.locked = false;
@@ -77,33 +84,34 @@ function showModes() {
 }
 
 function updateHeader() {
-  els.currentMode.textContent = modeMeta[state.mode].title;
+  els.currentMode.textContent = modeMeta[state.mode]?.title || 'Тренировка';
   els.streak.textContent = state.streak;
 }
 
 function buildChoices(task) {
-  const choices = Array.isArray(task.choices) && task.choices.length ? task.choices : [task.answer, 'е', 'и'];
+  const base = Array.isArray(task.choices) && task.choices.length ? task.choices : [task.answer, 'е'];
   const unique = [];
 
-  choices.forEach((choice) => {
+  [task.answer, ...base].forEach((choice) => {
     if (!unique.some((existing) => normalize(existing) === normalize(choice))) {
       unique.push(choice);
     }
   });
 
-  if (!unique.some((choice) => normalize(choice) === normalize(task.answer))) {
-    unique.unshift(task.answer);
+  const answerIndex = unique.findIndex((choice) => normalize(choice) === normalize(task.answer));
+  if (answerIndex > 0) {
+    const [answer] = unique.splice(answerIndex, 1);
+    unique.unshift(answer);
   }
 
-  return shuffle(unique).slice(0, 3);
+  return shuffle(unique.slice(0, 2));
 }
 
 function renderChoices(task) {
   els.choices.innerHTML = '';
-  const choices = buildChoices(task);
-  els.choices.classList.toggle('two-choices', choices.length === 2);
+  els.choices.classList.add('two-choices');
 
-  choices.forEach((choice) => {
+  buildChoices(task).forEach((choice) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'choice-button';
@@ -123,7 +131,8 @@ function renderTask() {
   els.maskedWord.className = 'masked-word enter';
   renderChoices(task);
   updateHeader();
-  window.setTimeout(() => els.maskedWord.classList.remove('enter'), 260);
+  tickTimer();
+  window.setTimeout(() => els.maskedWord.classList.remove('enter'), 220);
 }
 
 function submitAnswer(rawAnswer, button) {
@@ -133,7 +142,7 @@ function submitAnswer(rawAnswer, button) {
   const isCorrect = normalize(rawAnswer) === normalize(task.answer);
   state.locked = true;
 
-  document.querySelectorAll('.choice-button').forEach((choiceButton) => {
+  els.choices.querySelectorAll('.choice-button').forEach((choiceButton) => {
     choiceButton.disabled = true;
   });
 

@@ -147,6 +147,7 @@ function renderChoices(task) {
 function applyWordSize(masked) {
   const compactLength = masked.replace(/\s+/g, '').length;
   els.maskedWord.className = 'masked-word enter';
+  els.maskedWord.style.fontSize = '';
 
   if (compactLength >= 18) {
     els.maskedWord.classList.add('xxlong');
@@ -154,6 +155,21 @@ function applyWordSize(masked) {
     els.maskedWord.classList.add('xlong');
   } else if (compactLength >= 10) {
     els.maskedWord.classList.add('long');
+  }
+}
+
+function fitWordToLine() {
+  const word = els.maskedWord;
+  if (!word) return;
+
+  word.style.fontSize = '';
+  const availableWidth = word.parentElement.clientWidth - 8;
+  let size = Number.parseFloat(getComputedStyle(word).fontSize);
+  const minSize = 16;
+
+  while (word.scrollWidth > availableWidth && size > minSize) {
+    size -= 1;
+    word.style.fontSize = `${size}px`;
   }
 }
 
@@ -165,6 +181,7 @@ function renderTask() {
   els.result.textContent = '';
   renderMaskedWord(task.masked);
   applyWordSize(task.masked);
+  window.requestAnimationFrame(fitWordToLine);
   renderChoices(task);
   updateHeader();
   tickTimer();
@@ -210,5 +227,6 @@ function nextTask() {
   renderTask();
 }
 
+window.addEventListener('resize', fitWordToLine);
 els.modeButtons.forEach((button) => button.addEventListener('click', () => startMode(button.dataset.mode)));
 els.backTop.addEventListener('click', showModes);

@@ -148,7 +148,9 @@ function applyWordSize(masked) {
   const compactLength = masked.replace(/\s+/g, '').length;
   els.maskedWord.className = 'masked-word enter';
 
-  if (compactLength >= 14) {
+  if (compactLength >= 18) {
+    els.maskedWord.classList.add('xxlong');
+  } else if (compactLength >= 14) {
     els.maskedWord.classList.add('xlong');
   } else if (compactLength >= 10) {
     els.maskedWord.classList.add('long');
@@ -166,7 +168,7 @@ function renderTask() {
   renderChoices(task);
   updateHeader();
   tickTimer();
-  window.setTimeout(() => els.maskedWord.classList.remove('enter'), 220);
+  window.setTimeout(() => els.maskedWord.classList.remove('enter'), 180);
 }
 
 function submitAnswer(rawAnswer) {
@@ -183,10 +185,11 @@ function submitAnswer(rawAnswer) {
   if (isCorrect) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
+    els.maskedWord.classList.add('word-correct');
     els.successBanner.textContent = `✓ ${task.original}`;
     els.successBanner.classList.remove('hidden');
     updateHeader();
-    showModes.nextTimer = window.setTimeout(nextTask, 650);
+    showModes.nextTimer = window.setTimeout(nextTask, 430);
     return;
   }
 
@@ -194,7 +197,7 @@ function submitAnswer(rawAnswer) {
   els.result.textContent = `Правильно: ${task.original}`;
   els.result.classList.remove('hidden');
   updateHeader();
-  window.setTimeout(nextTask, 1100);
+  window.setTimeout(nextTask, 850);
 }
 
 function nextTask() {

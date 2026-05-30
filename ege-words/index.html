@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2d2f33" />
+    <title>ЕГЭ Слова — тренажёр сложных орфограмм</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <section id="mode-screen" class="screen mode-screen">
+        <div class="hero">
+          <span class="eyebrow">Русский язык · ЕГЭ</span>
+          <h1>ЕГЭ Слова</h1>
+          <p>Тренажёр сложных орфограмм</p>
+        </div>
+
+        <div class="mode-list" aria-label="Выбор режима">
+          <button class="mode-card" data-mode="task9">Задание 9</button>
+          <button class="mode-card" data-mode="task10">Задание 10</button>
+          <button class="mode-card" data-mode="task11">Задание 11</button>
+          <button class="mode-card" data-mode="task12">Задание 12</button>
+          <button class="mode-card" data-mode="prepri">ПРЕ/ПРИ</button>
+        </div>
+      </section>
+
+      <section id="trainer-screen" class="screen trainer-screen hidden" aria-live="polite">
+        <header class="topbar">
+          <button id="back-top" class="ghost-button" type="button">Разделы</button>
+          <div class="streak-pill">WIN STREAK: <strong id="streak">0</strong></div>
+        </header>
+
+        <div id="success-banner" class="success-banner hidden" role="status">✓ Верно</div>
+
+        <main class="trainer-main">
+          <h2 id="current-mode" class="mode-title">Задание</h2>
+
+          <article id="word-card" class="word-card">
+            <p class="card-label">Вставьте пропуск</p>
+            <div id="masked-word" class="masked-word">сл_во</div>
+            <p id="result-message" class="result-message hidden"></p>
+          </article>
+
+          <form id="answer-form" class="answer-form" autocomplete="off">
+            <input id="answer-input" inputmode="text" maxlength="3" placeholder="Ответ" aria-label="Введите ответ" />
+            <button id="check-button" class="primary-button" type="submit">OK</button>
+          </form>
+        </main>
+
+        <footer class="bottom-actions">
+          <button id="skip-button" class="secondary-button" type="button">Пропустить</button>
+          <button id="change-mode" class="secondary-button" type="button">Сменить раздел</button>
+        </footer>
+      </section>
+    </div>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

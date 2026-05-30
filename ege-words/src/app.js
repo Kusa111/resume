@@ -149,27 +149,12 @@ function applyWordSize(masked) {
   els.maskedWord.className = 'masked-word enter';
   els.maskedWord.style.fontSize = '';
 
-  if (compactLength >= 18) {
+  if (compactLength >= 20) {
     els.maskedWord.classList.add('xxlong');
-  } else if (compactLength >= 14) {
+  } else if (compactLength >= 16) {
     els.maskedWord.classList.add('xlong');
-  } else if (compactLength >= 10) {
+  } else if (compactLength >= 11) {
     els.maskedWord.classList.add('long');
-  }
-}
-
-function fitWordToLine() {
-  const word = els.maskedWord;
-  if (!word) return;
-
-  word.style.fontSize = '';
-  const availableWidth = word.parentElement.clientWidth - 8;
-  let size = Number.parseFloat(getComputedStyle(word).fontSize);
-  const minSize = 16;
-
-  while (word.scrollWidth > availableWidth && size > minSize) {
-    size -= 1;
-    word.style.fontSize = `${size}px`;
   }
 }
 
@@ -181,7 +166,6 @@ function renderTask() {
   els.result.textContent = '';
   renderMaskedWord(task.masked);
   applyWordSize(task.masked);
-  window.requestAnimationFrame(fitWordToLine);
   renderChoices(task);
   updateHeader();
   tickTimer();
@@ -203,8 +187,6 @@ function submitAnswer(rawAnswer) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
     els.maskedWord.classList.add('word-correct');
-    els.successBanner.textContent = `✓ ${task.original}`;
-    els.successBanner.classList.remove('hidden');
     updateHeader();
     showModes.nextTimer = window.setTimeout(nextTask, 430);
     return;
@@ -227,6 +209,5 @@ function nextTask() {
   renderTask();
 }
 
-window.addEventListener('resize', fitWordToLine);
 els.modeButtons.forEach((button) => button.addEventListener('click', () => startMode(button.dataset.mode)));
 els.backTop.addEventListener('click', showModes);

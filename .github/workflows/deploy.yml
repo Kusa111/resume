@@ -32,6 +32,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Include standalone EGE words trainer
+        run: cp -R ege-words dist/ege-words
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 

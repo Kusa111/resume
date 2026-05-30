@@ -158,7 +158,6 @@ function applyWordSize(masked) {
 function renderTask() {
   const task = currentTask();
   state.locked = false;
-  els.trainerScreen.classList.remove('correct-glow');
   els.successBanner.classList.add('hidden');
   els.result.classList.add('hidden');
   els.result.textContent = '';
@@ -184,7 +183,7 @@ function submitAnswer(rawAnswer) {
   if (isCorrect) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
-    els.trainerScreen.classList.add('correct-glow');
+    els.maskedWord.classList.add('word-correct');
     updateHeader();
     showModes.nextTimer = window.setTimeout(nextTask, 650);
     return;

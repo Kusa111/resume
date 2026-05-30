@@ -16,6 +16,7 @@ const els = {
   modeButtons: document.querySelectorAll('[data-mode]'),
   currentMode: document.querySelector('#current-mode'),
   streak: document.querySelector('#streak'),
+  streakPill: document.querySelector('.streak-pill'),
   timer: document.querySelector('#timer'),
   maskedWord: document.querySelector('#masked-word'),
   result: document.querySelector('#result-message'),
@@ -83,9 +84,22 @@ function showModes(event) {
   window.clearInterval(state.timerId);
 }
 
+function updateStreakVisual() {
+  const pill = els.streakPill;
+  if (!pill) return;
+
+  pill.classList.remove('heat-1', 'heat-2', 'heat-3', 'heat-4');
+
+  if (state.streak >= 20) pill.classList.add('heat-4');
+  else if (state.streak >= 15) pill.classList.add('heat-3');
+  else if (state.streak >= 10) pill.classList.add('heat-2');
+  else if (state.streak >= 5) pill.classList.add('heat-1');
+}
+
 function updateHeader() {
   els.currentMode.textContent = modeMeta[state.mode]?.title || 'Тренировка';
   els.streak.textContent = state.streak;
+  updateStreakVisual();
 }
 
 function buildChoices(task) {
@@ -97,12 +111,6 @@ function buildChoices(task) {
       unique.push(choice);
     }
   });
-
-  const answerIndex = unique.findIndex((choice) => normalize(choice) === normalize(task.answer));
-  if (answerIndex > 0) {
-    const [answer] = unique.splice(answerIndex, 1);
-    unique.unshift(answer);
-  }
 
   return shuffle(unique.slice(0, 2));
 }
@@ -121,6 +129,17 @@ function renderChoices(task) {
   });
 }
 
+function applyWordSize(masked) {
+  const compactLength = masked.replace(/\s+/g, '').length;
+  els.maskedWord.className = 'masked-word enter';
+
+  if (compactLength >= 14) {
+    els.maskedWord.classList.add('xlong');
+  } else if (compactLength >= 10) {
+    els.maskedWord.classList.add('long');
+  }
+}
+
 function renderTask() {
   const task = currentTask();
   state.locked = false;
@@ -128,7 +147,7 @@ function renderTask() {
   els.result.classList.add('hidden');
   els.result.textContent = '';
   els.maskedWord.textContent = task.masked;
-  els.maskedWord.className = 'masked-word enter';
+  applyWordSize(task.masked);
   renderChoices(task);
   updateHeader();
   tickTimer();
@@ -153,7 +172,7 @@ function submitAnswer(rawAnswer, button) {
     els.successBanner.textContent = `✓ ${task.original}`;
     els.successBanner.classList.remove('hidden');
     updateHeader();
-    showModes.nextTimer = window.setTimeout(nextTask, 520);
+    showModes.nextTimer = window.setTimeout(nextTask, 650);
     return;
   }
 
@@ -162,7 +181,7 @@ function submitAnswer(rawAnswer, button) {
   els.result.textContent = `Правильно: ${task.original}`;
   els.result.classList.remove('hidden');
   updateHeader();
-  window.setTimeout(nextTask, 1050);
+  window.setTimeout(nextTask, 1100);
 }
 
 function nextTask() {

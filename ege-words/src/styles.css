@@ -104,10 +104,7 @@ h1 {
 }
 .trainer-screen::after { display: none !important; }
 .topbar {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: start;
-  gap: 12px;
+  display: block;
   padding-top: 2px;
   position: relative;
   z-index: 3;
@@ -123,51 +120,10 @@ h1 {
   font-weight: 760;
   letter-spacing: -.01em;
 }
-.metrics {
-  display: grid;
-  gap: 6px;
-  justify-items: stretch;
-  min-width: 132px;
-}
+.metrics,
 .streak-pill,
 .timer-pill {
-  position: relative;
-  min-height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  border: 1px solid var(--line);
-  border-radius: 17px;
-  padding: 0 12px;
-  background: rgba(255,255,255,.055);
-  color: var(--muted);
-  font-size: .72rem;
-  font-weight: 800;
-  letter-spacing: .045em;
-  white-space: nowrap;
-}
-.streak-pill {
-  min-height: 42px;
-  overflow: hidden;
-  background-clip: padding-box;
-  transition: border-color .2s ease, background .2s ease, color .2s ease;
-}
-.streak-pill::before,
-.streak-pill::after { display: none !important; }
-.streak-pill strong {
-  color: var(--text);
-  font-size: .9rem;
-}
-.streak-pill.streak-1 { border-color: #4ade80; background: rgba(74,222,128,.10); }
-.streak-pill.streak-2 { border-color: #22d3ee; background: rgba(34,211,238,.10); }
-.streak-pill.streak-3 { border-color: #a78bfa; background: rgba(167,139,250,.11); }
-.streak-pill.streak-4 { border-color: #f472b6; background: rgba(244,114,182,.11); }
-.streak-pill.streak-5 { border-color: #facc15; background: rgba(250,204,21,.12); }
-.timer-pill {
-  color: rgba(247, 248, 251, .9);
-  font-size: .88rem;
-  letter-spacing: .02em;
+  display: none !important;
 }
 .success-banner {
   position: fixed;
@@ -180,11 +136,11 @@ h1 {
   align-items: center;
   justify-content: center;
   border-radius: 16px;
-  border: 1px solid rgba(134,239,172,.28);
-  background: rgba(22, 163, 74, .22);
-  color: #dcfce7;
+  border: 1px solid #4ade80;
+  background: #22c55e;
+  color: #052e16;
   font-size: .98rem;
-  font-weight: 800;
+  font-weight: 850;
   letter-spacing: -.01em;
   transform: translateX(-50%);
   animation: slideDown .18s ease both;
@@ -301,8 +257,7 @@ h1 {
 
 @media (max-width: 374px) {
   .app-shell { padding-inline: 14px; }
-  .ghost-button, .streak-pill, .timer-pill { padding-inline: 11px; font-size: .72rem; }
-  .metrics { min-width: 126px; }
+  .ghost-button { padding-inline: 11px; font-size: .72rem; }
   .choice-button { min-height: 80px; border-radius: 20px; font-size: 2.1rem; }
   .masked-word { min-height: 150px; font-size: clamp(2.3rem, 10vw, 3.6rem); }
   .masked-word.long { font-size: clamp(1.82rem, 7.7vw, 2.85rem); }

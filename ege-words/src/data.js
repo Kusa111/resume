@@ -11,41 +11,72 @@ const sources = {
 };
 
 export const modeMeta = {
-  task9_learn: { title: '9 · Учить', description: 'Корни: исключения' },
-  task9_hard: { title: '9 · Хард', description: 'Словарные и трудные слова' },
-  task10_learn: { title: '10 · Учить', description: 'Приставки, Ы/И, Ъ/Ь' },
-  task10_hard: { title: '10 · Хард', description: 'Контекст и трудные случаи' },
-  task11_learn: { title: '11 · Учить', description: 'Суффиксы: база' },
-  task11_hard: { title: '11 · Хард', description: 'Суффиксы: сложные слова' },
-  task12_learn: { title: '12 · Учить', description: 'Глаголы и причастия: база' },
-  task12_hard: { title: '12 · Хард', description: 'Глаголы и причастия: сложное' },
-  prepri: { title: 'ПРЕ / ПРИ', description: 'Выбор Е или И по смыслу' }
+  task9_learn: { title: '9 · Исключения' },
+  task9_hard: { title: '9 · Хард' },
+  task10_learn: { title: '10 · Исключения' },
+  task10_hard: { title: '10 · Хард' },
+  task11_learn: { title: '11 · Исключения' },
+  task11_hard: { title: '11 · Хард' },
+  task12_learn: { title: '12 · Исключения' },
+  task12_hard: { title: '12 · Хард' },
+  prepri: { title: 'ПРЕ / ПРИ' }
 };
 
 const splitWords = (key) => sources[key].split(',').map((word) => word.trim()).filter(Boolean);
 const make = (original, masked, answer, choices) => ({ original, masked, answer, choices });
+const key = (text) => text.toLowerCase().replace(/ё/g, 'е');
 
-const fallbackChoices = ['а', 'о', 'е'];
-const maskedAt = (text, index, length = 1, choices = fallbackChoices) => make(
-  text,
-  `${text.slice(0, index)}_${text.slice(index + length)}`,
-  text.slice(index, index + length),
-  choices
-);
+const VOWEL_CHOICES = {
+  'а': ['а', 'о', 'е'],
+  'о': ['о', 'а', 'е'],
+  'е': ['е', 'и', 'я'],
+  'и': ['и', 'е', 'ы'],
+  'ы': ['ы', 'и', 'е'],
+  'я': ['я', 'е', 'и'],
+  'ю': ['ю', 'у', 'я'],
+  'у': ['у', 'ю', 'о'],
+  'ё': ['ё', 'о', 'е'],
+  'ъ': ['ъ', 'ь', 'и'],
+  'ь': ['ь', 'ъ', 'и']
+};
 
-function maskFirst(text, regex, choices, offset = 0, length = 1) {
-  const match = text.match(regex);
-  if (!match || match.index === undefined) return null;
-  return maskedAt(text, match.index + offset, length, choices);
-}
-
-function fallbackMask(text) {
-  const index = text.search(/[аеёиоуыэюя]/iu);
-  return maskedAt(text, Math.max(index, 0), 1, ['а', 'о', 'е']);
-}
-
-const explicit = {
-  'иждивенец': ['ижд_венец', 'и', ['и', 'е', 'я']],
+const orthogramMap = {
+  'полог': ['п_лог', 'о', ['о', 'а', 'е']],
+  'слоговой': ['сл_говой', 'о', ['о', 'а', 'е']],
+  'росток': ['р_сток', 'о', ['о', 'а', 'е']],
+  'ростовщик': ['р_стовщик', 'о', ['о', 'а', 'е']],
+  'ростов': ['Р_стов', 'о', ['о', 'а', 'е']],
+  'ростислав': ['Р_стислав', 'о', ['о', 'а', 'е']],
+  'подростковый': ['подр_стковый', 'о', ['о', 'а', 'е']],
+  'отрасль': ['отр_сль', 'а', ['а', 'о', 'е']],
+  'на вырост': ['на выр_ст', 'о', ['о', 'а', 'е']],
+  'скачок': ['ск_чок', 'а', ['а', 'о', 'е']],
+  'скачу': ['ск_чу', 'а', ['а', 'о', 'е']],
+  'сочетать': ['соч_тать', 'е', ['е', 'и', 'я']],
+  'чета': ['ч_та', 'е', ['е', 'и', 'а']],
+  'обжиг': ['обж_г', 'и', ['и', 'е', 'ё']],
+  'розжиг': ['розж_г', 'и', ['и', 'е', 'ё']],
+  'выжиг': ['выж_г', 'и', ['и', 'е', 'ё']],
+  'выжимка': ['выж_мка', 'и', ['и', 'е', 'а']],
+  'подниму': ['подн_му', 'и', ['и', 'е', 'я']],
+  'выгарки': ['выг_рки', 'а', ['а', 'о', 'е']],
+  'изгарь': ['изг_рь', 'а', ['а', 'о', 'е']],
+  'пригарь': ['приг_рь', 'а', ['а', 'о', 'е']],
+  'утварь': ['_тварь', 'у', ['у', 'о', 'а']],
+  'зарница': ['з_рница', 'а', ['а', 'о', 'е']],
+  'заревать': ['з_ревать', 'а', ['а', 'о', 'е']],
+  'пловец': ['пл_вец', 'о', ['о', 'а', 'ы']],
+  'пловчиха': ['пл_вчиха', 'о', ['о', 'а', 'ы']],
+  'плывун': ['пл_вун', 'ы', ['ы', 'о', 'а']],
+  'промокнуть': ['пром_кнуть', 'о', ['о', 'а', 'е']],
+  'промокательная': ['пром_кательная', 'о', ['о', 'а', 'е']],
+  'равнение': ['р_внение', 'а', ['а', 'о', 'е']],
+  'равнина': ['р_внина', 'а', ['а', 'о', 'е']],
+  'уровень': ['ур_вень', 'о', ['о', 'а', 'е']],
+  'поровну': ['пор_вну', 'о', ['о', 'а', 'е']],
+  'ровесник': ['р_весник', 'о', ['о', 'а', 'е']],
+  'выровнять': ['выр_внять', 'о', ['о', 'а', 'е']],
+  'иждивенец': ['ижд_венец', 'и', ['и', 'е', 'ы']],
   'симпатичный': ['симп_тичный', 'а', ['а', 'о', 'е']],
   'симпатия': ['симп_тия', 'а', ['а', 'о', 'е']],
   'ориентир': ['ор_ентир', 'и', ['и', 'е', 'я']],
@@ -57,7 +88,7 @@ const explicit = {
   'недосягаемый': ['недос_гаемый', 'я', ['я', 'е', 'и']],
   'палисадник': ['п_лисадник', 'а', ['а', 'о', 'е']],
   'корифей': ['к_рифей', 'о', ['о', 'а', 'е']],
-  'лабиринт': ['лаб_ринт', 'и', ['и', 'е', 'я']],
+  'лабиринт': ['лаб_ринт', 'и', ['и', 'е', 'ы']],
   'катакомба': ['кат_комба', 'а', ['а', 'о', 'е']],
   'канонада': ['кан_нада', 'о', ['о', 'а', 'е']],
   'каморка': ['кам_рка', 'о', ['о', 'а', 'е']],
@@ -65,17 +96,26 @@ const explicit = {
   'колебаться': ['кол_баться', 'е', ['е', 'и', 'я']],
   'колоссальный': ['кол_ссальный', 'о', ['о', 'а', 'е']],
   'конфорка': ['конф_рка', 'о', ['о', 'а', 'е']],
-  'коричневый': ['кор_чневый', 'и', ['и', 'е', 'я']],
-  'канитель': ['кан_тель', 'и', ['и', 'е', 'я']],
-  'папильотки': ['пап_льотки', 'и', ['и', 'е', 'ь']],
-  'полог': ['п_лог', 'о', ['о', 'а', 'е']],
-  'слоговой': ['сл_говой', 'о', ['о', 'а', 'е']],
-  'чета': ['ч_та', 'е', ['е', 'и', 'а']],
-  'утварь': ['_тварь', 'у', ['у', 'о', 'а']],
-  'уровень': ['ур_вень', 'о', ['о', 'а', 'е']],
-  'поровну': ['пор_вну', 'о', ['о', 'а', 'е']],
-  'ровесник': ['р_весник', 'о', ['о', 'а', 'е']],
-  'выровнять': ['выр_внять', 'о', ['о', 'а', 'е']],
+  'коричневый': ['кор_чневый', 'и', ['и', 'е', 'ы']],
+  'канитель': ['кан_тель', 'и', ['и', 'е', 'ы']],
+  'папильотки': ['пап_льотки', 'и', ['и', 'е', 'ы']],
+  'цыган': ['ц_ган', 'ы', ['ы', 'и', 'е']],
+  'цыпленок': ['ц_плёнок', 'ы', ['ы', 'и', 'е']],
+  'цыпочки': ['ц_почки', 'ы', ['ы', 'и', 'е']],
+  'цыкнуть': ['ц_кнуть', 'ы', ['ы', 'и', 'е']],
+  'цыц': ['ц_ц', 'ы', ['ы', 'и', 'е']],
+  'жюри': ['ж_ри', 'ю', ['ю', 'у', 'я']],
+  'парашют': ['параш_т', 'ю', ['ю', 'у', 'я']],
+  'брошюра': ['брош_ра', 'ю', ['ю', 'у', 'я']],
+  'капюшон': ['кап_шон', 'ю', ['ю', 'у', 'я']],
+  'шов': ['ш_в', 'о', ['о', 'ё', 'е']],
+  'шорох': ['ш_рох', 'о', ['о', 'ё', 'е']],
+  'обжора': ['обж_ра', 'о', ['о', 'ё', 'е']],
+  'трущоба': ['трущ_ба', 'о', ['о', 'ё', 'е']],
+  'крыжовник': ['крыж_вник', 'о', ['о', 'ё', 'е']]
+};
+
+const suffixMap = {
   'продлевать': ['продл_вать', 'е', ['е', 'и', 'я']],
   'затмевать': ['затм_вать', 'е', ['е', 'и', 'я']],
   'застревать': ['застр_вать', 'е', ['е', 'и', 'я']],
@@ -84,13 +124,32 @@ const explicit = {
   'подразумевать': ['подразум_вать', 'е', ['е', 'и', 'я']],
   'недоумевать': ['недоум_вать', 'е', ['е', 'и', 'я']],
   'намереваться': ['намер_ваться', 'е', ['е', 'и', 'я']],
-  'заведовать': ['завед_вать', 'о', ['о', 'а', 'е']],
-  'проповедовать': ['проповед_вать', 'о', ['о', 'а', 'е']],
+  'заведовать': ['завед_вать', 'о', ['о', 'а', 'ы']],
+  'проповедовать': ['проповед_вать', 'о', ['о', 'а', 'ы']],
   'разведывать': ['развед_вать', 'ы', ['ы', 'и', 'о']],
   'отведывать': ['отвед_вать', 'ы', ['ы', 'и', 'о']],
   'проведывать': ['провед_вать', 'ы', ['ы', 'и', 'о']],
+  'запечатлеть': ['запечатл_ть', 'е', ['е', 'и', 'я']],
+  'облицевать': ['облиц_вать', 'е', ['е', 'и', 'о']],
+  'преодолевать': ['преодол_вать', 'е', ['е', 'и', 'я']],
+  'одолевать': ['одол_вать', 'е', ['е', 'и', 'я']],
+  'увещевать': ['увещ_вать', 'е', ['е', 'и', 'я']],
+  'подозревать': ['подозр_вать', 'е', ['е', 'и', 'я']],
+  'разевать': ['раз_вать', 'е', ['е', 'и', 'я']],
+  'горевать': ['гор_вать', 'е', ['е', 'и', 'я']],
+  'ночевать': ['ноч_вать', 'е', ['е', 'и', 'я']],
+  'потчевать': ['потч_вать', 'е', ['е', 'и', 'я']],
+  'кочевать': ['коч_вать', 'е', ['е', 'и', 'я']],
   'обессилеть': ['обессил_ть', 'е', ['е', 'и', 'я']],
   'обессилить': ['обессил_ть', 'и', ['и', 'е', 'я']],
+  'речонка': ['реч_нка', 'о', ['о', 'ё', 'е']],
+  'лишён': ['лиш_н', 'ё', ['ё', 'о', 'е']],
+  'дирижер': ['дириж_р', 'ё', ['ё', 'о', 'е']],
+  'сестрицын': ['сестриц_н', 'ы', ['ы', 'и', 'е']],
+  'ворсистый': ['ворс_стый', 'и', ['и', 'е', 'ы']]
+};
+
+const participleMap = {
   'приемлемый': ['приемл_мый', 'е', ['е', 'и', 'я']],
   'неприемлемый': ['неприемл_мый', 'е', ['е', 'и', 'я']],
   'неотъемлемый': ['неотъемл_мый', 'е', ['е', 'и', 'я']],
@@ -100,74 +159,87 @@ const explicit = {
   'недвижимый': ['недвиж_мый', 'и', ['и', 'е', 'я']],
   'брезжущий': ['брезж_щий', 'у', ['у', 'ю', 'я']],
   'всеобъемлющий': ['всеобъемл_щий', 'ю', ['ю', 'я', 'у']],
-  'лелеющий': ['леле_щий', 'ю', ['ю', 'я', 'е']]
+  'лелеющий': ['леле_щий', 'ю', ['ю', 'я', 'е']],
+  'клеящий': ['кле_щий', 'я', ['я', 'е', 'ю']],
+  'строящий': ['стро_щий', 'я', ['я', 'е', 'ю']],
+  'слышащий': ['слыш_щий', 'а', ['а', 'я', 'е']],
+  'дышащий': ['дыш_щий', 'а', ['а', 'я', 'е']],
+  'держащий': ['держ_щий', 'а', ['а', 'я', 'е']],
+  'видящий': ['вид_щий', 'я', ['я', 'е', 'ю']],
+  'ненавидящий': ['ненавид_щий', 'я', ['я', 'е', 'ю']],
+  'зависящий': ['завис_щий', 'я', ['я', 'е', 'ю']],
+  'обидящий': ['обид_щий', 'я', ['я', 'е', 'ю']],
+  'гонящий': ['гон_щий', 'я', ['я', 'е', 'ю']],
+  'терпящий': ['терп_щий', 'я', ['я', 'е', 'ю']],
+  'вертящий': ['верт_щий', 'я', ['я', 'е', 'ю']]
 };
 
-function explicitMask(text) {
-  const item = explicit[text.toLowerCase()];
-  if (!item) return null;
-  return make(text, item[0], item[1], item[2]);
+function fromMap(text, map) {
+  const item = map[key(text)];
+  return item ? make(text, item[0], item[1], item[2]) : null;
+}
+
+function maskAt(text, index, length = 1, choices) {
+  const answer = text.slice(index, index + length);
+  return make(text, `${text.slice(0, index)}_${text.slice(index + length)}`, answer, choices || VOWEL_CHOICES[key(answer)] || ['а', 'о', 'е']);
+}
+
+function maskFirst(text, regex, choices, offset = 0, length = 1) {
+  const match = text.match(regex);
+  if (!match || match.index === undefined) return null;
+  return maskAt(text, match.index + offset, length, choices);
+}
+
+function fallbackMask(text) {
+  const vowels = [...text.matchAll(/[аеёиоуыэюя]/giu)];
+  const match = vowels[Math.min(1, vowels.length - 1)];
+  if (!match || match.index === undefined) return make(text, text, '', ['а', 'о', 'е']);
+  const answer = match[0];
+  return maskAt(text, match.index, 1, VOWEL_CHOICES[key(answer)] || ['а', 'о', 'е']);
 }
 
 function maskPrePri(text) {
   const match = text.match(/пр[еи]/iu);
   if (!match || match.index === undefined) return fallbackMask(text);
-  const answer = text[match.index + 2].toLowerCase();
-  return maskedAt(text, match.index + 2, 1, ['е', 'и']);
+  return maskAt(text, match.index + 2, 1, ['е', 'и']);
 }
 
 function maskTask9(text) {
-  const lower = text.toLowerCase();
-  const ready = explicitMask(text);
-  if (ready) return ready;
-  if (/цы|ци/.test(lower)) return maskFirst(text, /[ыи]/iu, ['ы', 'и', 'е']) || fallbackMask(text);
+  const direct = fromMap(text, orthogramMap);
+  if (direct) return direct;
+  if (/[ц]/iu.test(text)) return maskFirst(text, /[ыи]/iu, ['ы', 'и', 'е']) || fallbackMask(text);
   if (/[жшчщ]ю/iu.test(text)) return maskFirst(text, /ю/iu, ['ю', 'у', 'я']) || fallbackMask(text);
   if (/[жшчщ][оё]/iu.test(text)) return maskFirst(text, /[оё]/iu, ['о', 'ё', 'е']) || fallbackMask(text);
-  if (/лаг|лож|лог|слог|полог/.test(lower)) return maskFirst(text, /[ао]/iu, ['а', 'о', 'е']) || fallbackMask(text);
-  if (/раст|ращ|рос|рост|отрасл|вырост|подрост/.test(lower)) return maskFirst(text, /[ао]/iu, ['а', 'о', 'е']) || fallbackMask(text);
-  if (/скак|скач/.test(lower)) return maskFirst(text, /[ао]/iu, ['а', 'о', 'е']) || fallbackMask(text);
-  if (/жиг|жег|жёг/.test(lower)) return maskFirst(text, /[иеё]/iu, ['и', 'е', 'ё']) || fallbackMask(text);
-  if (/чет|чит/.test(lower)) return maskFirst(text, /[еи]/iu, ['е', 'и', 'я']) || fallbackMask(text);
-  if (/гар|гор/.test(lower)) return maskFirst(text, /[ао]/iu, ['а', 'о', 'е']) || fallbackMask(text);
-  if (/зар|зор/.test(lower)) return maskFirst(text, /[ао]/iu, ['а', 'о', 'е']) || fallbackMask(text);
-  if (/плав|плов|плыв/.test(lower)) return maskFirst(text, /[аоы]/iu, ['а', 'о', 'ы']) || fallbackMask(text);
-  if (/мок|мак/.test(lower)) return maskFirst(text, /[ао]/iu, ['а', 'о', 'е']) || fallbackMask(text);
-  if (/равн|ровн/.test(lower)) return maskFirst(text, /[ао]/iu, ['а', 'о', 'е']) || fallbackMask(text);
   return fallbackMask(text);
 }
 
 function maskTask10(text) {
-  const lower = text.toLowerCase();
   if (/пр[еи]/iu.test(text)) return maskPrePri(text);
   if (/[ъь]/u.test(text)) return maskFirst(text, /[ъь]/u, ['ъ', 'ь', 'и']) || fallbackMask(text);
-  if (/(без|пред|под|раз|об)ы/.test(lower)) return maskFirst(text, /[ыи]/iu, ['ы', 'и', 'е']) || fallbackMask(text);
-  if (/инф|инв|иняз|иниц|инст|игр|дезин|постин|спортин|оргед|контр/.test(lower)) return maskFirst(text, /[ыи]/iu, ['и', 'ы', 'е']) || fallbackMask(text);
-  if (/^взим/.test(lower)) return maskFirst(text, /и/iu, ['и', 'ы', 'е']) || fallbackMask(text);
-  if (/^про/.test(lower)) return maskedAt(text, 2, 1, ['о', 'а', 'е']);
+  if (/(без|пред|под|раз|об)ы/iu.test(text)) return maskFirst(text, /[ыи]/iu, ['ы', 'и', 'е']) || fallbackMask(text);
+  if (/инф|инв|иняз|инст|игр|дезин|постин|спортин|оргед|контр|взим/iu.test(text)) return maskFirst(text, /[ыи]/iu, ['и', 'ы', 'е']) || fallbackMask(text);
+  if (/^про/iu.test(text)) return maskAt(text, 2, 1, ['о', 'а', 'е']);
   return fallbackMask(text);
 }
 
 function maskTask11(text) {
-  const ready = explicitMask(text);
-  if (ready) return ready;
-  if (/евать|еваться|евал|евывать|ивать|ывать|овать|еват/.test(text)) return maskFirst(text, /[еиоы]вать|[еиоы]ваться/iu, ['е', 'и', 'о'], 0, 1) || fallbackMask(text);
-  if (/овый|евый|овый/.test(text)) return maskFirst(text, /[ео]в/iu, ['е', 'о', 'и']) || fallbackMask(text);
-  if (/чон|чён|жон|жён/.test(text)) return maskFirst(text, /[оё]/iu, ['о', 'ё', 'е']) || fallbackMask(text);
-  if (/ин|ын|ицын/.test(text)) return maskFirst(text, /[иы]н/iu, ['и', 'ы', 'е']) || fallbackMask(text);
+  const direct = fromMap(text, suffixMap);
+  if (direct) return direct;
+  if (/(ева|ива|ыва|ова)/iu.test(text)) return maskFirst(text, /(ева|ива|ыва|ова)/iu, ['е', 'и', 'ы'], 0, 1) || fallbackMask(text);
+  if (/(евый|овый)/iu.test(text)) return maskFirst(text, /(евый|овый)/iu, ['е', 'о', 'и'], 0, 1) || fallbackMask(text);
+  if (/[чщжш][оё]/iu.test(text)) return maskFirst(text, /[оё]/iu, ['о', 'ё', 'е']) || fallbackMask(text);
+  if (/(ицын|ын)/iu.test(text)) return maskFirst(text, /[ыи]/iu, ['ы', 'и', 'е']) || fallbackMask(text);
   return fallbackMask(text);
 }
 
 function maskTask12(text) {
-  const ready = explicitMask(text);
-  if (ready) return ready;
-  if (/ющий|ющее|ющая|ющие/.test(text)) return maskFirst(text, /ющий|ющее|ющая|ющие/iu, ['ю', 'я', 'у'], 0, 1) || fallbackMask(text);
-  if (/ящий|ящая|ящие|ящийся/.test(text)) return maskFirst(text, /ящий|ящая|ящие|ящийся/iu, ['я', 'ю', 'е'], 0, 1) || fallbackMask(text);
-  if (/ащий|ащая|ащие|ащийся/.test(text)) return maskFirst(text, /ащий|ащая|ащие|ащийся/iu, ['а', 'я', 'е'], 0, 1) || fallbackMask(text);
-  if (/имый|имая|имое|имые/.test(text)) return maskFirst(text, /имый|имая|имое|имые/iu, ['и', 'е', 'я'], 0, 1) || fallbackMask(text);
-  if (/емый|емая|емое|емые/.test(text)) return maskFirst(text, /емый|емая|емое|емые/iu, ['е', 'и', 'я'], 0, 1) || fallbackMask(text);
-  if (/еянн|еян|еяв|еявш|еющ|еющий/.test(text)) return maskFirst(text, /[ея]нн|[ея]в|[ея]ющ/iu, ['е', 'я', 'и'], 0, 1) || fallbackMask(text);
-  if (/клеящ|строящ|слышаш|дышаш|держаш|видяш|ненавидяш|зависящ|обидящ|гонящ|терпящ|вертящ/.test(text)) return maskFirst(text, /[яа]щ/iu, ['я', 'а', 'ю']) || fallbackMask(text);
-  if (/енн|анн|янн/.test(text)) return maskFirst(text, /енн|анн|янн/iu, ['енн', 'анн', 'янн'], 0, 3) || fallbackMask(text);
+  const direct = fromMap(text, participleMap);
+  if (direct) return direct;
+  if (/(ущ|ющ)/iu.test(text)) return maskFirst(text, /(ущ|ющ)/iu, ['у', 'ю', 'я'], 0, 1) || fallbackMask(text);
+  if (/(ащ|ящ)/iu.test(text)) return maskFirst(text, /(ащ|ящ)/iu, ['а', 'я', 'е'], 0, 1) || fallbackMask(text);
+  if (/(ем|им)/iu.test(text)) return maskFirst(text, /(ем|им)/iu, ['е', 'и', 'я'], 0, 1) || fallbackMask(text);
+  if (/(енн|анн|янн)/iu.test(text)) return maskFirst(text, /(енн|анн|янн)/iu, ['енн', 'анн', 'янн'], 0, 3) || fallbackMask(text);
+  if (/(еян|еяв|аяв|явш|евш|ивш)/iu.test(text)) return maskFirst(text, /[еяи]в|[ея]н/iu, ['е', 'я', 'и'], 0, 1) || fallbackMask(text);
   return fallbackMask(text);
 }
 

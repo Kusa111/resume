@@ -107,7 +107,7 @@ h1 {
   display: block;
   padding-top: 2px;
   position: relative;
-  z-index: 3;
+  z-index: 30;
 }
 .ghost-button {
   width: fit-content;
@@ -127,21 +127,22 @@ h1 {
 }
 .success-banner {
   position: fixed;
-  top: 14px;
+  top: 76px;
   left: 50%;
-  width: min(calc(100% - 28px), 430px);
-  min-height: 48px;
+  width: min(calc(100% - 36px), 390px);
+  min-height: 44px;
   z-index: 20;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
-  border: 1px solid #4ade80;
-  background: #22c55e;
-  color: #052e16;
-  font-size: .98rem;
-  font-weight: 850;
+  border-radius: 14px;
+  border: 1px solid rgba(134, 239, 172, .55);
+  background: #34c759;
+  color: #062e13;
+  font-size: .95rem;
+  font-weight: 750;
   letter-spacing: -.01em;
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
   transform: translateX(-50%);
   animation: slideDown .18s ease both;
 }
@@ -170,7 +171,9 @@ h1 {
 .masked-word {
   min-height: 166px;
   display: block;
-  padding: 16px 4px;
+  padding: 16px 0;
+  width: 100%;
+  max-width: 100%;
   color: var(--text);
   font-size: clamp(2.85rem, 12vw, 4.6rem);
   font-weight: 900;

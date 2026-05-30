@@ -183,7 +183,8 @@ function submitAnswer(rawAnswer) {
   if (isCorrect) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
-    els.maskedWord.classList.add('word-correct');
+    els.successBanner.textContent = `✓ ${task.original}`;
+    els.successBanner.classList.remove('hidden');
     updateHeader();
     showModes.nextTimer = window.setTimeout(nextTask, 650);
     return;

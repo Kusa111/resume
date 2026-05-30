@@ -5,7 +5,6 @@ const state = {
   deck: [],
   index: 0,
   streak: 0,
-  solved: 0,
   locked: false
 };
 
@@ -15,17 +14,17 @@ const els = {
   modeButtons: document.querySelectorAll('[data-mode]'),
   currentMode: document.querySelector('#current-mode'),
   streak: document.querySelector('#streak'),
-  wordCard: document.querySelector('#word-card'),
   maskedWord: document.querySelector('#masked-word'),
   result: document.querySelector('#result-message'),
-  form: document.querySelector('#answer-form'),
-  input: document.querySelector('#answer-input'),
-  check: document.querySelector('#check-button'),
+  choices: document.querySelector('#choice-row'),
   skip: document.querySelector('#skip-button'),
   changeMode: document.querySelector('#change-mode'),
   backTop: document.querySelector('#back-top'),
   successBanner: document.querySelector('#success-banner')
 };
+
+const singleChoices = ['е', 'и', 'о', 'а', 'ы', 'ё', 'у', 'ю', 'ъ', 'ь'];
+const multiChoices = ['енн', 'анн', 'янн', 'ем', 'им', 'ущ', 'ющ', 'ащ', 'ящ'];
 
 const normalize = (value) => value.trim().toLocaleLowerCase('ru-RU').replace(/йо/g, 'ё');
 const bestKey = (mode) => `ege-words:best-streak:${mode}`;
@@ -48,7 +47,6 @@ function startMode(mode) {
   state.deck = shuffle(tasks[mode]);
   state.index = 0;
   state.streak = 0;
-  state.solved = 0;
   state.locked = false;
   els.modeScreen.classList.add('hidden');
   els.trainerScreen.classList.remove('hidden');
@@ -67,48 +65,76 @@ function updateHeader() {
   els.streak.textContent = state.streak;
 }
 
+function buildChoices(answer) {
+  const normalizedAnswer = normalize(answer);
+  const source = normalizedAnswer.length > 1 ? multiChoices : singleChoices;
+  const pool = new Set([answer]);
+
+  while (pool.size < 3) {
+    const candidate = source[Math.floor(Math.random() * source.length)];
+    if (normalize(candidate) !== normalizedAnswer) {
+      pool.add(candidate);
+    }
+  }
+
+  return shuffle([...pool]);
+}
+
+function renderChoices(answer) {
+  els.choices.innerHTML = '';
+
+  buildChoices(answer).forEach((choice) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'choice-button';
+    button.textContent = choice;
+    button.addEventListener('click', () => submitAnswer(choice, button));
+    els.choices.append(button);
+  });
+}
+
 function renderTask() {
   const task = currentTask();
   state.locked = false;
-  els.wordCard.className = 'word-card bump';
   els.successBanner.classList.add('hidden');
-  els.maskedWord.textContent = task.masked;
   els.result.classList.add('hidden');
   els.result.textContent = '';
-  els.input.value = '';
-  els.input.disabled = false;
-  els.check.disabled = false;
+  els.maskedWord.textContent = task.masked;
+  els.maskedWord.className = 'masked-word enter';
+  renderChoices(task.answer);
   updateHeader();
-  window.setTimeout(() => els.wordCard.classList.remove('bump'), 260);
-  window.setTimeout(() => els.input.focus({ preventScroll: true }), 80);
+  window.setTimeout(() => els.maskedWord.classList.remove('enter'), 260);
 }
 
-function submitAnswer() {
+function submitAnswer(rawAnswer, button) {
   if (state.locked) return;
+
   const task = currentTask();
-  const answer = normalize(els.input.value);
-  if (!answer) return;
-
+  const isCorrect = normalize(rawAnswer) === normalize(task.answer);
   state.locked = true;
-  state.solved += 1;
-  els.input.disabled = true;
-  els.check.disabled = true;
 
-  const isCorrect = answer === normalize(task.answer);
+  document.querySelectorAll('.choice-button').forEach((choiceButton) => {
+    choiceButton.disabled = true;
+  });
+
   if (isCorrect) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
+    button.classList.add('correct');
+    els.successBanner.textContent = `✓ ${task.original}`;
     els.successBanner.classList.remove('hidden');
     updateHeader();
-    showModes.nextTimer = window.setTimeout(nextTask, 620);
+    showModes.nextTimer = window.setTimeout(nextTask, 520);
     return;
   }
 
   state.streak = 0;
-  els.wordCard.classList.add('bad');
+  button.classList.add('wrong');
   els.result.textContent = `Правильно: ${task.original}`;
   els.result.classList.remove('hidden');
   updateHeader();
+
+  window.setTimeout(nextTask, 1050);
 }
 
 function nextTask() {
@@ -122,20 +148,11 @@ function nextTask() {
 }
 
 function skipTask() {
-  if (state.locked) {
-    nextTask();
-    return;
-  }
   state.streak = 0;
-  state.solved += 1;
   nextTask();
 }
 
 els.modeButtons.forEach((button) => button.addEventListener('click', () => startMode(button.dataset.mode)));
-els.form.addEventListener('submit', (event) => {
-  event.preventDefault();
-  submitAnswer();
-});
 els.skip.addEventListener('click', skipTask);
 els.changeMode.addEventListener('click', showModes);
 els.backTop.addEventListener('click', showModes);

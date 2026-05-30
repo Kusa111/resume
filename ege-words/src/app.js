@@ -5,7 +5,9 @@ const state = {
   deck: [],
   index: 0,
   streak: 0,
-  locked: false
+  locked: false,
+  startedAt: null,
+  timerId: null
 };
 
 const els = {
@@ -14,17 +16,13 @@ const els = {
   modeButtons: document.querySelectorAll('[data-mode]'),
   currentMode: document.querySelector('#current-mode'),
   streak: document.querySelector('#streak'),
+  timer: document.querySelector('#timer'),
   maskedWord: document.querySelector('#masked-word'),
   result: document.querySelector('#result-message'),
   choices: document.querySelector('#choice-row'),
-  skip: document.querySelector('#skip-button'),
-  changeMode: document.querySelector('#change-mode'),
   backTop: document.querySelector('#back-top'),
   successBanner: document.querySelector('#success-banner')
 };
-
-const singleChoices = ['е', 'и', 'о', 'а', 'ы', 'ё', 'у', 'ю', 'ъ', 'ь'];
-const multiChoices = ['енн', 'анн', 'янн', 'ем', 'им', 'ущ', 'ющ', 'ащ', 'ящ'];
 
 const normalize = (value) => value.trim().toLocaleLowerCase('ru-RU').replace(/йо/g, 'ё');
 const bestKey = (mode) => `ege-words:best-streak:${mode}`;
@@ -42,6 +40,22 @@ function currentTask() {
   return state.deck[state.index];
 }
 
+function formatTime(ms) {
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  return `${minutes}:${seconds}`;
+}
+
+function startTimer() {
+  window.clearInterval(state.timerId);
+  state.startedAt = Date.now();
+  els.timer.textContent = '00:00';
+  state.timerId = window.setInterval(() => {
+    els.timer.textContent = formatTime(Date.now() - state.startedAt);
+  }, 1000);
+}
+
 function startMode(mode) {
   state.mode = mode;
   state.deck = shuffle(tasks[mode]);
@@ -50,6 +64,7 @@ function startMode(mode) {
   state.locked = false;
   els.modeScreen.classList.add('hidden');
   els.trainerScreen.classList.remove('hidden');
+  startTimer();
   renderTask();
 }
 
@@ -58,6 +73,7 @@ function showModes() {
   els.modeScreen.classList.remove('hidden');
   state.locked = false;
   window.clearTimeout(showModes.nextTimer);
+  window.clearInterval(state.timerId);
 }
 
 function updateHeader() {
@@ -65,25 +81,29 @@ function updateHeader() {
   els.streak.textContent = state.streak;
 }
 
-function buildChoices(answer) {
-  const normalizedAnswer = normalize(answer);
-  const source = normalizedAnswer.length > 1 ? multiChoices : singleChoices;
-  const pool = new Set([answer]);
+function buildChoices(task) {
+  const choices = Array.isArray(task.choices) && task.choices.length ? task.choices : [task.answer, 'е', 'и'];
+  const unique = [];
 
-  while (pool.size < 3) {
-    const candidate = source[Math.floor(Math.random() * source.length)];
-    if (normalize(candidate) !== normalizedAnswer) {
-      pool.add(candidate);
+  choices.forEach((choice) => {
+    if (!unique.some((existing) => normalize(existing) === normalize(choice))) {
+      unique.push(choice);
     }
+  });
+
+  if (!unique.some((choice) => normalize(choice) === normalize(task.answer))) {
+    unique.unshift(task.answer);
   }
 
-  return shuffle([...pool]);
+  return shuffle(unique).slice(0, 3);
 }
 
-function renderChoices(answer) {
+function renderChoices(task) {
   els.choices.innerHTML = '';
+  const choices = buildChoices(task);
+  els.choices.classList.toggle('two-choices', choices.length === 2);
 
-  buildChoices(answer).forEach((choice) => {
+  choices.forEach((choice) => {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'choice-button';
@@ -101,7 +121,7 @@ function renderTask() {
   els.result.textContent = '';
   els.maskedWord.textContent = task.masked;
   els.maskedWord.className = 'masked-word enter';
-  renderChoices(task.answer);
+  renderChoices(task);
   updateHeader();
   window.setTimeout(() => els.maskedWord.classList.remove('enter'), 260);
 }
@@ -133,7 +153,6 @@ function submitAnswer(rawAnswer, button) {
   els.result.textContent = `Правильно: ${task.original}`;
   els.result.classList.remove('hidden');
   updateHeader();
-
   window.setTimeout(nextTask, 1050);
 }
 
@@ -147,12 +166,5 @@ function nextTask() {
   renderTask();
 }
 
-function skipTask() {
-  state.streak = 0;
-  nextTask();
-}
-
 els.modeButtons.forEach((button) => button.addEventListener('click', () => startMode(button.dataset.mode)));
-els.skip.addEventListener('click', skipTask);
-els.changeMode.addEventListener('click', showModes);
 els.backTop.addEventListener('click', showModes);

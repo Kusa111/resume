@@ -102,6 +102,20 @@ h1 {
   flex-direction: column;
   overflow: hidden;
 }
+.trainer-screen::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 88px;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(180deg, rgba(34,197,94,.28) 0%, rgba(34,197,94,.12) 44%, transparent 100%);
+  transition: opacity .16s ease;
+  z-index: 2;
+}
+.trainer-screen.correct-top-glow::before { opacity: 1; }
 .trainer-screen::after { display: none !important; }
 .topbar {
   display: block;
@@ -125,27 +139,7 @@ h1 {
 .timer-pill {
   display: none !important;
 }
-.success-banner {
-  position: fixed;
-  top: 76px;
-  left: 50%;
-  width: min(calc(100% - 36px), 390px);
-  min-height: 44px;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 14px;
-  border: 1px solid rgba(134, 239, 172, .55);
-  background: #34c759;
-  color: #062e13;
-  font-size: .95rem;
-  font-weight: 750;
-  letter-spacing: -.01em;
-  box-shadow: 0 8px 22px rgba(0,0,0,.18);
-  transform: translateX(-50%);
-  animation: slideDown .18s ease both;
-}
+.success-banner { display: none !important; }
 
 .trainer-main {
   flex: 1;
@@ -154,7 +148,7 @@ h1 {
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
-  gap: 30px;
+  gap: 22px;
   padding: 26px 0 10px;
   position: relative;
   z-index: 1;
@@ -197,10 +191,6 @@ h1 {
   letter-spacing: -.01em;
 }
 .masked-word.enter { animation: wordIn .18s ease both; }
-.masked-word.word-correct {
-  color: #bbf7d0;
-  text-shadow: 0 0 20px rgba(34,197,94,.24), 0 18px 48px rgba(0,0,0,.25);
-}
 .blank-slot {
   display: inline;
   color: rgba(247,248,251,.9);
@@ -208,6 +198,14 @@ h1 {
   font-weight: 700;
   line-height: 1;
   text-shadow: none;
+}
+.result-message {
+  min-height: 24px;
+  margin: -6px 0 0;
+  color: #ffd4da;
+  font-size: 1rem;
+  font-weight: 760;
+  text-align: center;
 }
 .choice-row {
   display: grid;
@@ -239,23 +237,11 @@ h1 {
   border-color: rgba(255,255,255,.14);
   background: rgba(255,255,255,.055);
 }
-.result-message {
-  min-height: 24px;
-  margin: -12px 0 0;
-  color: #ffd4da;
-  font-size: .98rem;
-  font-weight: 720;
-  text-align: center;
-}
 .ghost-button:active { transform: translateY(1px) scale(.99); }
 
 @keyframes wordIn {
   0% { opacity: 0; transform: translateY(8px) scale(.985); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes slideDown {
-  0% { opacity: 0; transform: translate(-50%, -8px); }
-  100% { opacity: 1; transform: translate(-50%, 0); }
 }
 
 @media (max-width: 374px) {

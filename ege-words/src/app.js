@@ -88,12 +88,13 @@ function updateStreakVisual() {
   const pill = els.streakPill;
   if (!pill) return;
 
-  pill.classList.remove('heat-1', 'heat-2', 'heat-3', 'heat-4');
+  pill.classList.remove('streak-1', 'streak-2', 'streak-3', 'streak-4', 'streak-5');
 
-  if (state.streak >= 20) pill.classList.add('heat-4');
-  else if (state.streak >= 15) pill.classList.add('heat-3');
-  else if (state.streak >= 10) pill.classList.add('heat-2');
-  else if (state.streak >= 5) pill.classList.add('heat-1');
+  if (state.streak >= 25) pill.classList.add('streak-5');
+  else if (state.streak >= 20) pill.classList.add('streak-4');
+  else if (state.streak >= 15) pill.classList.add('streak-3');
+  else if (state.streak >= 10) pill.classList.add('streak-2');
+  else if (state.streak >= 5) pill.classList.add('streak-1');
 }
 
 function updateHeader() {
@@ -113,7 +114,7 @@ function escapeHtml(value) {
 
 function renderMaskedWord(masked) {
   const escaped = escapeHtml(masked);
-  els.maskedWord.innerHTML = escaped.replace('_', '<span class="blank-slot" aria-label="пропуск"></span>');
+  els.maskedWord.innerHTML = escaped.replace('_', '<span class="blank-slot" aria-label="пропуск">_</span>');
 }
 
 function buildChoices(task) {
@@ -138,7 +139,7 @@ function renderChoices(task) {
     button.type = 'button';
     button.className = 'choice-button';
     button.textContent = choice;
-    button.addEventListener('click', () => submitAnswer(choice, button));
+    button.addEventListener('click', () => submitAnswer(choice));
     els.choices.append(button);
   });
 }
@@ -157,6 +158,7 @@ function applyWordSize(masked) {
 function renderTask() {
   const task = currentTask();
   state.locked = false;
+  els.trainerScreen.classList.remove('correct-glow');
   els.successBanner.classList.add('hidden');
   els.result.classList.add('hidden');
   els.result.textContent = '';
@@ -168,7 +170,7 @@ function renderTask() {
   window.setTimeout(() => els.maskedWord.classList.remove('enter'), 220);
 }
 
-function submitAnswer(rawAnswer, button) {
+function submitAnswer(rawAnswer) {
   if (state.locked) return;
 
   const task = currentTask();
@@ -182,17 +184,13 @@ function submitAnswer(rawAnswer, button) {
   if (isCorrect) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
-    button.classList.add('correct');
-    els.maskedWord.classList.add('word-correct');
-    els.maskedWord.querySelector('.blank-slot')?.classList.add('blank-correct');
+    els.trainerScreen.classList.add('correct-glow');
     updateHeader();
     showModes.nextTimer = window.setTimeout(nextTask, 650);
     return;
   }
 
   state.streak = 0;
-  button.classList.add('wrong');
-  els.maskedWord.classList.add('word-wrong');
   els.result.textContent = `Правильно: ${task.original}`;
   els.result.classList.remove('hidden');
   updateHeader();

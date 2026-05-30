@@ -102,6 +102,20 @@ function updateHeader() {
   updateStreakVisual();
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function renderMaskedWord(masked) {
+  const escaped = escapeHtml(masked);
+  els.maskedWord.innerHTML = escaped.replace('_', '<span class="blank-slot" aria-label="пропуск"></span>');
+}
+
 function buildChoices(task) {
   const base = Array.isArray(task.choices) && task.choices.length ? task.choices : [task.answer, 'е'];
   const unique = [];
@@ -146,7 +160,7 @@ function renderTask() {
   els.successBanner.classList.add('hidden');
   els.result.classList.add('hidden');
   els.result.textContent = '';
-  els.maskedWord.textContent = task.masked;
+  renderMaskedWord(task.masked);
   applyWordSize(task.masked);
   renderChoices(task);
   updateHeader();
@@ -169,8 +183,8 @@ function submitAnswer(rawAnswer, button) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
     button.classList.add('correct');
-    els.successBanner.textContent = `✓ ${task.original}`;
-    els.successBanner.classList.remove('hidden');
+    els.maskedWord.classList.add('word-correct');
+    els.maskedWord.querySelector('.blank-slot')?.classList.add('blank-correct');
     updateHeader();
     showModes.nextTimer = window.setTimeout(nextTask, 650);
     return;
@@ -178,6 +192,7 @@ function submitAnswer(rawAnswer, button) {
 
   state.streak = 0;
   button.classList.add('wrong');
+  els.maskedWord.classList.add('word-wrong');
   els.result.textContent = `Правильно: ${task.original}`;
   els.result.classList.remove('hidden');
   updateHeader();

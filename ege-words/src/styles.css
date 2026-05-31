@@ -224,6 +224,12 @@ h1 {
   line-height: 1;
   text-shadow: none;
 }
+.inserted-letter {
+  color: #4ade80;
+  font: inherit;
+  font-weight: 950;
+  text-shadow: 0 0 18px rgba(74,222,128,.35);
+}
 .result-message {
   min-height: 30px;
   margin: -14px 0 4px;
@@ -232,6 +238,13 @@ h1 {
   font-weight: 900;
   text-align: center;
   text-shadow: 0 0 14px rgba(255, 95, 111, .18);
+}
+.correct-letter-hint {
+  color: #ff7a88;
+  font-style: italic;
+  font-weight: 950;
+  text-transform: uppercase;
+  text-shadow: 0 0 16px rgba(255, 95, 111, .28);
 }
 .choice-row {
   display: grid;

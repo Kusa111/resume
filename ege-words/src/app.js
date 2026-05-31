@@ -80,6 +80,7 @@ function showModes(event) {
   els.trainerScreen.classList.add('hidden');
   els.modeScreen.classList.remove('hidden');
   state.locked = false;
+  document.body.classList.remove('glow-10', 'glow-20', 'glow-30');
   window.clearTimeout(showModes.nextTimer);
   window.clearInterval(state.timerId);
 }
@@ -89,6 +90,11 @@ function updateStreakVisual() {
   if (!pill) return;
 
   pill.classList.remove('streak-1', 'streak-2', 'streak-3', 'streak-4', 'streak-5');
+  document.body.classList.remove('glow-10', 'glow-20', 'glow-30');
+
+  if (state.streak >= 30) document.body.classList.add('glow-30');
+  else if (state.streak >= 20) document.body.classList.add('glow-20');
+  else if (state.streak >= 10) document.body.classList.add('glow-10');
 
   if (state.streak >= 25) pill.classList.add('streak-5');
   else if (state.streak >= 20) pill.classList.add('streak-4');

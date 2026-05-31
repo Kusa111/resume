@@ -165,7 +165,7 @@ function fitWordToLine() {
   word.style.fontSize = '';
   const availableWidth = word.parentElement.clientWidth - 6;
   let size = Number.parseFloat(getComputedStyle(word).fontSize);
-  const minSize = 15;
+  const minSize = 19;
 
   while (word.scrollWidth > availableWidth && size > minSize) {
     size -= 1;

@@ -117,6 +117,18 @@ function renderMaskedWord(masked) {
   els.maskedWord.innerHTML = escaped.replace('_', '<span class="blank-slot" aria-label="пропуск">_</span>');
 }
 
+function renderAnsweredWord(task) {
+  const escaped = escapeHtml(task.masked);
+  const letter = escapeHtml(String(task.answer).toLocaleLowerCase('ru-RU'));
+  els.maskedWord.innerHTML = escaped.replace('_', `<span class="inserted-letter">${letter}</span>`);
+}
+
+function renderWrongHint(task) {
+  const escaped = escapeHtml(task.masked);
+  const letter = escapeHtml(String(task.answer).toLocaleUpperCase('ru-RU'));
+  els.result.innerHTML = `Правильно: ${escaped.replace('_', `<em class="correct-letter-hint">${letter}</em>`)}`;
+}
+
 function buildChoices(task) {
   const base = Array.isArray(task.choices) && task.choices.length ? task.choices : [task.answer, 'е'];
   const unique = [];
@@ -165,7 +177,7 @@ function fitWordToLine() {
   word.style.fontSize = '';
   const availableWidth = word.parentElement.clientWidth - 6;
   let size = Number.parseFloat(getComputedStyle(word).fontSize);
-  const minSize = 25;
+  const minSize = 30;
 
   while (word.scrollWidth > availableWidth && size > minSize) {
     size -= 1;
@@ -203,13 +215,16 @@ function submitAnswer(rawAnswer, button) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
     button.classList.add('correct');
+    renderAnsweredWord(task);
+    applyWordSize(task.masked);
+    window.requestAnimationFrame(fitWordToLine);
     updateHeader();
     showModes.nextTimer = window.setTimeout(nextTask, 430);
     return;
   }
 
   state.streak = 0;
-  els.result.textContent = `Правильно: ${task.original}`;
+  renderWrongHint(task);
   els.result.classList.remove('hidden');
   updateHeader();
   window.setTimeout(nextTask, 850);

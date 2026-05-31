@@ -141,7 +141,7 @@ function renderWrongHint(task) {
 
 function pushHistory(task) {
   state.history.unshift({ html: renderAnsweredWord(task) });
-  state.history = state.history.slice(0, 4);
+  state.history = state.history.slice(0, 1);
   renderHistory(true);
 }
 
@@ -254,6 +254,7 @@ function submitAnswer(rawAnswer, button) {
   }
 
   state.streak = 0;
+  pushHistory(task);
   renderWrongHint(task);
   els.result.classList.remove('hidden');
   updateHeader();

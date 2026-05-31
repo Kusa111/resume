@@ -129,6 +129,14 @@ function renderWrongHint(task) {
   els.result.innerHTML = `Правильно: ${escaped.replace('_', `<em class="correct-letter-hint">${letter}</em>`)}`;
 }
 
+function scheduleMissedTask(task) {
+  const remaining = state.deck.length - state.index - 1;
+  const maxOffset = Math.min(10, Math.max(1, remaining));
+  const offset = Math.floor(Math.random() * maxOffset) + 1;
+  const insertAt = state.index + offset;
+  state.deck.splice(insertAt, 0, task);
+}
+
 function buildChoices(task) {
   const base = Array.isArray(task.choices) && task.choices.length ? task.choices : [task.answer, 'е'];
   const unique = [];
@@ -224,6 +232,7 @@ function submitAnswer(rawAnswer, button) {
   }
 
   state.streak = 0;
+  scheduleMissedTask(task);
   renderWrongHint(task);
   els.result.classList.remove('hidden');
   updateHeader();

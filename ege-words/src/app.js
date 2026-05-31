@@ -139,7 +139,7 @@ function renderChoices(task) {
     button.type = 'button';
     button.className = 'choice-button';
     button.textContent = choice;
-    button.addEventListener('click', () => submitAnswer(choice));
+    button.addEventListener('click', () => submitAnswer(choice, button));
     els.choices.append(button);
   });
 }
@@ -165,7 +165,7 @@ function fitWordToLine() {
   word.style.fontSize = '';
   const availableWidth = word.parentElement.clientWidth - 6;
   let size = Number.parseFloat(getComputedStyle(word).fontSize);
-  const minSize = 12;
+  const minSize = 15;
 
   while (word.scrollWidth > availableWidth && size > minSize) {
     size -= 1;
@@ -176,7 +176,6 @@ function fitWordToLine() {
 function renderTask() {
   const task = currentTask();
   state.locked = false;
-  els.trainerScreen.classList.remove('correct-strip');
   els.successBanner.classList.add('hidden');
   els.result.classList.add('hidden');
   els.result.textContent = '';
@@ -189,7 +188,7 @@ function renderTask() {
   window.setTimeout(() => els.maskedWord.classList.remove('enter'), 180);
 }
 
-function submitAnswer(rawAnswer) {
+function submitAnswer(rawAnswer, button) {
   if (state.locked) return;
 
   const task = currentTask();
@@ -203,7 +202,7 @@ function submitAnswer(rawAnswer) {
   if (isCorrect) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
-    els.trainerScreen.classList.add('correct-strip');
+    button.classList.add('correct');
     updateHeader();
     showModes.nextTimer = window.setTimeout(nextTask, 430);
     return;

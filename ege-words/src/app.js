@@ -7,7 +7,8 @@ const state = {
   streak: 0,
   locked: false,
   startedAt: null,
-  timerId: null
+  timerId: null,
+  history: []
 };
 
 const els = {
@@ -19,6 +20,7 @@ const els = {
   streakPill: document.querySelector('.streak-pill'),
   timer: document.querySelector('#timer'),
   maskedWord: document.querySelector('#masked-word'),
+  wordHistory: document.querySelector('#word-history'),
   result: document.querySelector('#result-message'),
   choices: document.querySelector('#choice-row'),
   backTop: document.querySelector('#back-top'),
@@ -69,9 +71,11 @@ function startMode(mode) {
   state.index = 0;
   state.streak = 0;
   state.locked = false;
+  state.history = [];
   els.modeScreen.classList.add('hidden');
   els.trainerScreen.classList.remove('hidden');
   startTimer();
+  renderHistory();
   renderTask();
 }
 
@@ -80,6 +84,8 @@ function showModes(event) {
   els.trainerScreen.classList.add('hidden');
   els.modeScreen.classList.remove('hidden');
   state.locked = false;
+  state.history = [];
+  renderHistory();
   window.clearTimeout(showModes.nextTimer);
   window.clearInterval(state.timerId);
 }
@@ -120,13 +126,36 @@ function renderMaskedWord(masked) {
 function renderAnsweredWord(task) {
   const escaped = escapeHtml(task.masked);
   const letter = escapeHtml(String(task.answer).toLocaleLowerCase('ru-RU'));
-  els.maskedWord.innerHTML = escaped.replace('_', `<span class="inserted-letter">${letter}</span>`);
+  return escaped.replace('_', `<span class="inserted-letter">${letter}</span>`);
+}
+
+function renderCurrentAnsweredWord(task) {
+  els.maskedWord.innerHTML = renderAnsweredWord(task);
 }
 
 function renderWrongHint(task) {
   const escaped = escapeHtml(task.masked);
   const letter = escapeHtml(String(task.answer).toLocaleUpperCase('ru-RU'));
   els.result.innerHTML = `Правильно: ${escaped.replace('_', `<em class="correct-letter-hint">${letter}</em>`)}`;
+}
+
+function pushHistory(task) {
+  state.history.unshift({ html: renderAnsweredWord(task) });
+  state.history = state.history.slice(0, 4);
+  renderHistory(true);
+}
+
+function renderHistory(animate = false) {
+  if (!els.wordHistory) return;
+  els.wordHistory.innerHTML = '';
+
+  state.history.forEach((item, index) => {
+    const node = document.createElement('div');
+    node.className = `history-word history-${index + 1}`;
+    if (animate && index === 0) node.classList.add('history-new');
+    node.innerHTML = item.html;
+    els.wordHistory.append(node);
+  });
 }
 
 function buildChoices(task) {
@@ -215,9 +244,10 @@ function submitAnswer(rawAnswer, button) {
     state.streak += 1;
     if (state.streak > getBest(state.mode)) setBest(state.mode, state.streak);
     button.classList.add('correct');
-    renderAnsweredWord(task);
+    renderCurrentAnsweredWord(task);
     applyWordSize(task.masked);
     window.requestAnimationFrame(fitWordToLine);
+    pushHistory(task);
     updateHeader();
     showModes.nextTimer = window.setTimeout(nextTask, 430);
     return;

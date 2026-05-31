@@ -4,6 +4,8 @@
   --text: #f7f8fb;
   --muted: #9ca3af;
   --line: rgba(255, 255, 255, 0.12);
+  --top-glow: rgba(255,255,255,.075);
+  --top-glow-2: rgba(255,255,255,0);
   font-family: Inter, "Segoe UI", Roboto, Arial, system-ui, -apple-system, sans-serif;
 }
 
@@ -14,10 +16,23 @@ body {
   margin: 0;
   color: var(--text);
   background:
-    radial-gradient(circle at 50% -8%, rgba(255,255,255,.075), transparent 30rem),
+    radial-gradient(circle at 50% -8%, var(--top-glow), var(--top-glow-2) 30rem),
     linear-gradient(180deg, var(--bg2) 0%, var(--bg) 62%, #08090c 100%);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background .35s ease;
+}
+body.glow-10 {
+  --top-glow: rgba(34, 211, 238, .20);
+  --top-glow-2: rgba(167, 139, 250, 0);
+}
+body.glow-20 {
+  --top-glow: rgba(244, 114, 182, .22);
+  --top-glow-2: rgba(59, 130, 246, 0);
+}
+body.glow-30 {
+  --top-glow: rgba(250, 204, 21, .24);
+  --top-glow-2: rgba(249, 115, 22, 0);
 }
 button { font: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .hidden { display: none !important; }

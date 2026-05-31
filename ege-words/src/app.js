@@ -112,8 +112,15 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+function focusMaskedToken(masked) {
+  const parts = String(masked).split(/\s+/).filter(Boolean);
+  const target = parts.find((part) => part.includes('_')) || masked;
+  return target.replace(/^[()«»"'.,;:!?—-]+|[()«»"'.,;:!?—-]+$/g, '');
+}
+
 function renderMaskedWord(masked) {
-  const escaped = escapeHtml(masked);
+  const focused = focusMaskedToken(masked);
+  const escaped = escapeHtml(focused);
   els.maskedWord.innerHTML = escaped.replace('_', '<span class="blank-slot" aria-label="пропуск">_</span>');
 }
 
@@ -145,15 +152,16 @@ function renderChoices(task) {
 }
 
 function applyWordSize(masked) {
-  const compactLength = masked.replace(/\s+/g, '').length;
+  const focused = focusMaskedToken(masked);
+  const compactLength = focused.replace(/\s+/g, '').length;
   els.maskedWord.className = 'masked-word enter';
   els.maskedWord.style.fontSize = '';
 
-  if (compactLength >= 20) {
+  if (compactLength >= 18) {
     els.maskedWord.classList.add('xxlong');
-  } else if (compactLength >= 16) {
+  } else if (compactLength >= 14) {
     els.maskedWord.classList.add('xlong');
-  } else if (compactLength >= 11) {
+  } else if (compactLength >= 10) {
     els.maskedWord.classList.add('long');
   }
 }
@@ -165,7 +173,7 @@ function fitWordToLine() {
   word.style.fontSize = '';
   const availableWidth = word.parentElement.clientWidth - 6;
   let size = Number.parseFloat(getComputedStyle(word).fontSize);
-  const minSize = 19;
+  const minSize = 30;
 
   while (word.scrollWidth > availableWidth && size > minSize) {
     size -= 1;
